@@ -16,7 +16,7 @@
   <nav class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-rose-100/60">
     <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
       <a href="/" aria-label="AI Operator home">
-        <img src="/images/logo.png" alt="AI Operator" class="h-8 w-auto" />
+        <img src="/images/logo.png" alt="AI Operator" class="h-11 w-auto" />
       </a>
       <div class="flex items-center gap-4">
         <a href="#pricing" class="hidden sm:block text-sm text-slate-500 hover:text-slate-800 transition-colors">Pricing</a>
@@ -32,6 +32,22 @@
   <header class="relative min-h-screen flex flex-col justify-center border-b border-rose-100 overflow-hidden pt-16">
     <div class="hero-glow" aria-hidden="true"></div>
     <div class="hero-grid" aria-hidden="true"></div>
+
+    <!-- Ghost watermark logo -->
+    <div aria-hidden="true" class="absolute inset-0 overflow-hidden pointer-events-none select-none">
+      <img src="/images/logo.png" alt=""
+        class="absolute"
+        style="
+          right: -6%;
+          top: 50%;
+          transform: translateY(-50%);
+          width: min(680px, 72vw);
+          opacity: 0.055;
+          filter: blur(1px) grayscale(20%);
+          mix-blend-mode: multiply;
+        "
+      />
+    </div>
 
     <div class="relative z-10 max-w-5xl mx-auto px-6 py-24 flex flex-col gap-10">
 
@@ -337,7 +353,18 @@
     </section>
 
     <!-- ─── CTA SECTION ───────────────────────────────────── -->
-    <section class="cta-section">
+    <section class="cta-section" style="position: relative; overflow: hidden;">
+      <img src="/images/logo.png" alt="" aria-hidden="true" class="absolute pointer-events-none select-none"
+        style="
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%) rotate(-8deg);
+          width: min(600px, 90vw);
+          opacity: 0.04;
+          filter: blur(2px);
+          mix-blend-mode: multiply;
+        "
+      />
       <p class="text-sm uppercase tracking-[0.3em] text-pink-400">Let's build</p>
       <h2 class="text-4xl md:text-5xl font-bold text-slate-800">Your Architect is ready.<br/>Are you?</h2>
       <p class="text-xl text-slate-600 max-w-xl">Two weeks from now, your business is live. Let's get started.</p>
