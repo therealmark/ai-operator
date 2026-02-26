@@ -9,12 +9,12 @@
 (() => {
   const TEST = {
     'ai-operator-kit':      'https://buy.stripe.com/test_fZucN48gV26adLccXseME0a',
-    'fractional-architect': null, // TODO: add test payment link
+    'fractional-architect': 'https://buy.stripe.com/test_3cIfZgap326agXoe1weME0b',
   };
 
   const LIVE = {
     'ai-operator-kit':      'https://buy.stripe.com/5kQ3cucng0be86Y0Q9b7y0e',
-    'fractional-architect': null, // TODO: add live Stripe subscription payment link
+    'fractional-architect': 'https://buy.stripe.com/aFafZg5YSgac4UMbuNb7y0f',
   };
 
   const useTest = window.location.hostname === 'localhost' ||
@@ -25,13 +25,7 @@
   document.querySelectorAll('[data-checkout]').forEach(btn => {
     const slug = btn.getAttribute('data-checkout');
     const url  = links[slug];
-    if (!url) {
-      // Not yet wired — fall back to calendar booking
-      btn.addEventListener('click', () => {
-        window.open('https://calendar.app.google/tN2C8hnMdvQDa8Vf7', '_blank', 'noopener');
-      });
-      return;
-    }
+    if (!url) return;
     btn.addEventListener('click', () => { window.location.href = url; });
   });
 })();
