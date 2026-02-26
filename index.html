@@ -87,11 +87,11 @@
       <!-- CTAs -->
       <div class="flex flex-col sm:flex-row gap-4">
         <button class="cta-primary" data-checkout="ai-operator-kit">
-          Book Your 1-on-1 — $25
+          Start Your Bootcamp — $25
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
-        <a href="https://calendar.app.google/tN2C8hnMdvQDa8Vf7" target="_blank" rel="noopener" class="cta-secondary">
-          Meet your coach first
+        <a href="#pricing" class="cta-secondary">
+          Explore all options
         </a>
       </div>
 
@@ -221,6 +221,69 @@
       </div>
     </section>
 
+    <!-- ─── PRICING ─────────────────────────────────────────── -->
+    <section id="pricing" class="space-y-10">
+      <div class="text-center space-y-4 max-w-3xl mx-auto">
+        <p class="uppercase tracking-[0.3em] text-sm text-pink-500">Two ways to work together</p>
+        <h2 class="text-4xl md:text-5xl font-bold text-slate-800">Choose your path.</h2>
+        <p class="text-slate-500 text-lg">Whether you're building your foundation or scaling what you've got — there's a way in that fits exactly where you are.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 items-stretch">
+
+        <!-- Option 1: Bootcamp -->
+        <div class="bg-white border border-rose-100 rounded-3xl p-8 shadow-sm flex flex-col gap-6">
+          <div>
+            <span class="inline-block text-xs uppercase tracking-widest text-pink-500 bg-pink-50 px-3 py-1 rounded-full mb-4">Get started</span>
+            <h3 class="text-2xl font-bold text-slate-800">AI Operator Bootcamp</h3>
+            <p class="text-slate-500 mt-2 leading-relaxed">Two private weeks. One coach. An AI Operator built entirely around you — then yours to keep forever.</p>
+          </div>
+          <div class="flex items-end gap-2">
+            <span class="text-5xl font-extrabold text-slate-800">$25</span>
+            <span class="text-slate-400 mb-2 text-lg">one time</span>
+          </div>
+          <ul class="space-y-3 text-slate-600 flex-1">
+            <li class="flex gap-3"><span class="text-pink-400 mt-0.5">▸</span> Private 1-on-1 sessions across 2 weeks</li>
+            <li class="flex gap-3"><span class="text-pink-400 mt-0.5">▸</span> Personal AI Operator built to your exact workflow</li>
+            <li class="flex gap-3"><span class="text-pink-400 mt-0.5">▸</span> Custom tools built live — for how you earn and create</li>
+            <li class="flex gap-3"><span class="text-pink-400 mt-0.5">▸</span> All sessions recorded — yours to revisit forever</li>
+            <li class="flex gap-3"><span class="text-pink-400 mt-0.5">▸</span> Personal roadmap for what to build next</li>
+          </ul>
+          <button class="cta-primary" data-checkout="ai-operator-kit">
+            Start Your Bootcamp — $25
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+
+        <!-- Option 2: Fractional Principal Architect -->
+        <div class="bg-white rounded-3xl p-8 shadow-md flex flex-col gap-6 relative" style="border: 2px solid #c4b5fd;">
+          <div class="absolute -top-4 left-8">
+            <span class="inline-block text-xs uppercase tracking-widest text-violet-600 bg-violet-100 px-3 py-1 rounded-full font-semibold">Ongoing support</span>
+          </div>
+          <div class="pt-2">
+            <h3 class="text-2xl font-bold text-slate-800">Fractional Principal Architect</h3>
+            <p class="text-slate-500 mt-2 leading-relaxed">1 hour per week of dedicated in-person or remote access to a Principal Architect. Strategic, hands-on, and ongoing — as your operation grows.</p>
+          </div>
+          <div class="flex items-end gap-2">
+            <span class="text-5xl font-extrabold text-slate-800" id="fpa-price">$—</span>
+            <span class="text-slate-400 mb-2 text-lg">/month</span>
+          </div>
+          <ul class="space-y-3 text-slate-600 flex-1">
+            <li class="flex gap-3"><span class="text-violet-400 mt-0.5">▸</span> 1 hour/week — in person or remote, your choice</li>
+            <li class="flex gap-3"><span class="text-violet-400 mt-0.5">▸</span> Ongoing AI strategy and architecture guidance</li>
+            <li class="flex gap-3"><span class="text-violet-400 mt-0.5">▸</span> Hands-on builds, reviews, and live optimizations</li>
+            <li class="flex gap-3"><span class="text-violet-400 mt-0.5">▸</span> Flexible scheduling around your calendar</li>
+            <li class="flex gap-3"><span class="text-violet-400 mt-0.5">▸</span> Cancel anytime — no lock-in</li>
+          </ul>
+          <button class="cta-primary" data-checkout="fractional-architect" style="background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%); box-shadow: 0 4px 24px rgba(124,58,237,0.18);">
+            Get Monthly Access
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
     <!-- ─── QUOTE ──────────────────────────────────────────── -->
     <section class="vision-section">
       <div class="space-y-6 max-w-3xl">
@@ -234,15 +297,18 @@
     <section class="cta-section">
       <p class="text-sm uppercase tracking-[0.3em] text-pink-400">Your next chapter</p>
       <h2 class="text-4xl md:text-5xl font-bold text-slate-800">Your coach is ready.<br/>Are you?</h2>
-      <p class="text-xl text-slate-600 max-w-xl">Twenty-five dollars. Two weeks of private 1-on-1 sessions. A AI Operator built around you that keeps working long after we're done. Some doors only need opening once.</p>
-      <div class="flex flex-col sm:flex-row gap-4">
+      <p class="text-xl text-slate-600 max-w-xl">Two ways in. One outcome — a version of you with more room to do what actually matters.</p>
+      <div class="flex flex-col sm:flex-row gap-4 flex-wrap">
         <button class="cta-primary" data-checkout="ai-operator-kit">
-          Start Your 1-on-1 — $25
+          Start Your Bootcamp — $25
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <button class="cta-primary" data-checkout="fractional-architect" style="background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%); box-shadow: 0 4px 24px rgba(124,58,237,0.18);">
+          Get Monthly Architect Access
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
         <a href="#faq" class="border border-pink-200 text-pink-500 px-6 py-4 rounded-2xl text-lg flex items-center justify-center hover:border-pink-400 hover:text-pink-600 transition-colors">I have a question first</a>
       </div>
-      <p class="text-sm text-slate-400">One payment. No subscriptions. Your coach, your AI Operator, yours forever.</p>
     </section>
 
     <!-- ─── FAQ ───────────────────────────────────────────── -->
