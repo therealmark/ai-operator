@@ -1,8 +1,4 @@
 /* ── Base ──────────────────────────────────────────────────── */
-html, body {
-  overflow-x: hidden;
-}
-
 body {
   font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: #f8fafc; /* Soft light blue-gray for cozy feel */
