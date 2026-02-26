@@ -38,17 +38,21 @@
         </p>
       </div>
 
-      <!-- Animated terminal -->
-      <div class="terminal-window max-w-2xl">
-        <div class="terminal-bar">
-          <span class="dot dot-red"></span>
-          <span class="dot dot-yellow"></span>
-          <span class="dot dot-green"></span>
-          <span class="terminal-title">sidekick — live</span>
+      <!-- iMessage animation -->
+      <div class="imessage-window">
+        <div class="imessage-header">
+          <div class="imessage-avatar">🤖</div>
+          <div class="imessage-header-info">
+            <div class="imessage-name">Sidekick</div>
+            <div class="imessage-online">● Active now</div>
+          </div>
         </div>
-        <div class="terminal-body">
-          <div class="terminal-line"><span class="terminal-prompt">▸</span> <span id="task-line" class="terminal-task"></span><span class="terminal-cursor">█</span></div>
-          <div class="terminal-status" id="status-line"></div>
+        <div class="imessage-body" id="chat-body"></div>
+        <div class="imessage-footer">
+          <div class="imessage-inputbar">
+            <span id="chat-input" class="imessage-input-text"></span><span class="imessage-cursor">|</span>
+          </div>
+          <button class="imessage-send" aria-label="Send">↑</button>
         </div>
       </div>
 
@@ -276,60 +280,78 @@
 
   <script src="/js/stripe-checkout.js" defer></script>
   <script>
-    // ─── Terminal animation ──────────────────────────────────
-    const tasks = [
-      { text: "Deploying auto-scaling cloud infrastructure...",        status: "✓ Done in 4.2s" },
-      { text: "Analyzing 6 months of competitor pricing data...",      status: "✓ Report ready" },
-      { text: "Building automated revenue reporting pipeline...",      status: "✓ Live — runs nightly" },
-      { text: "Drafting product roadmap from 47 customer notes...",    status: "✓ Strategic brief generated" },
-      { text: "Spinning up staging environment + CI/CD...",           status: "✓ Deploy pipeline active" },
-      { text: "Researching enterprise integration partners...",        status: "✓ 12 leads qualified" },
-      { text: "Optimizing database queries across 3 services...",      status: "✓ 3× faster" },
-      { text: "Generating investor update from last quarter...",       status: "✓ Ready to send" },
+    // ─── iMessage animation ──────────────────────────────────
+    const conversations = [
+      { user: "Can you deploy the new infrastructure?",          reply: "Done! ⚡ Auto-scaling stack is live" },
+      { user: "Analyze last 6 months of competitor pricing",     reply: "✓ Report ready — 3 key insights found" },
+      { user: "Build me a nightly revenue pipeline",             reply: "Pipeline running 🚀 First report tonight" },
+      { user: "Draft product roadmap from customer notes",       reply: "Strategic brief ready 📋" },
+      { user: "Set up CI/CD for the new project",               reply: "Deploy pipeline active ✅ Push to ship" },
+      { user: "Research enterprise integration partners",        reply: "12 leads qualified 🎯 Full list attached" },
+      { user: "Optimize the database — it's been slow",         reply: "3× faster ✓ Query plan fixed" },
+      { user: "Write the investor update for last quarter",      reply: "Draft ready 📨 Want me to send it?" },
     ];
 
-    let taskIndex = 0;
-    let charIndex = 0;
-    let isDeleting = false;
-    let statusTimeout;
+    let convIndex = 0;
+    const chatBody = document.getElementById('chat-body');
+    const chatInput = document.getElementById('chat-input');
 
-    const taskLine = document.getElementById('task-line');
-    const statusLine = document.getElementById('status-line');
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-    function typeTask() {
-      const current = tasks[taskIndex];
-
-      if (!isDeleting) {
-        taskLine.textContent = current.text.slice(0, charIndex + 1);
-        charIndex++;
-        if (charIndex === current.text.length) {
-          // Show status, pause, then start deleting
-          statusTimeout = setTimeout(() => {
-            statusLine.textContent = current.status;
-            statusLine.classList.add('visible');
-            setTimeout(() => {
-              isDeleting = true;
-              statusLine.classList.remove('visible');
-              setTimeout(() => { statusLine.textContent = ''; }, 300);
-              requestAnimationFrame(() => setTimeout(typeTask, 50));
-            }, 2200);
-          }, 400);
-          return;
-        }
-      } else {
-        taskLine.textContent = current.text.slice(0, charIndex - 1);
-        charIndex--;
-        if (charIndex === 0) {
-          isDeleting = false;
-          taskIndex = (taskIndex + 1) % tasks.length;
-        }
+    async function typeInto(el, text, speed = 38) {
+      for (let i = 0; i <= text.length; i++) {
+        el.textContent = text.slice(0, i);
+        await sleep(speed);
       }
-
-      const speed = isDeleting ? 18 : 38;
-      setTimeout(typeTask, speed);
     }
 
-    typeTask();
+    function addBubble(text, type) {
+      const bubble = document.createElement('div');
+      bubble.className = `chat-bubble ${type}`;
+      bubble.textContent = text;
+      chatBody.appendChild(bubble);
+      chatBody.scrollTop = chatBody.scrollHeight;
+      return bubble;
+    }
+
+    async function runChat() {
+      const conv = conversations[convIndex % conversations.length];
+      convIndex++;
+
+      // Clear
+      chatBody.innerHTML = '';
+      chatInput.textContent = '';
+
+      await sleep(700);
+
+      // Type into input bar
+      await typeInto(chatInput, conv.user, 36);
+      await sleep(300);
+
+      // Send — bubble appears, input clears
+      addBubble(conv.user, 'sent');
+      chatInput.textContent = '';
+
+      await sleep(600);
+
+      // Typing indicator
+      const typing = document.createElement('div');
+      typing.className = 'chat-typing';
+      typing.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+      chatBody.appendChild(typing);
+      chatBody.scrollTop = chatBody.scrollHeight;
+
+      await sleep(1600);
+
+      // Reply
+      chatBody.removeChild(typing);
+      addBubble(conv.reply, 'received');
+
+      await sleep(2800);
+      runChat();
+    }
+
+    runChat();
 
     // ─── Counter animation ───────────────────────────────────
     function animateCounter(el) {
