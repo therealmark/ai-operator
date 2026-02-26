@@ -403,8 +403,8 @@ body {
 
 /* ── Before / After cards ──────────────────────────────────── */
 .before-card {
-  background: rgba(248, 113, 113, 0.1); /* Soft red */
-  border: 1px solid rgba(248, 113, 113, 0.2);
+  background: rgba(167, 139, 250, 0.08); /* Soft violet for builders */
+  border: 1px solid rgba(167, 139, 250, 0.2);
   border-radius: 24px;
   padding: 28px;
 }
