@@ -13,7 +13,7 @@
   };
 
   const LIVE = {
-    'ai-operator-kit':      'https://buy.stripe.com/5kQ3cucng0be86Y0Q9b7y0e',
+    'ai-operator-kit':      'https://book.stripe.com/cNi3cucnggacgDu56pb7y0g',
     'fractional-architect': 'https://buy.stripe.com/aFafZg5YSgac4UMbuNb7y0f',
   };
 
