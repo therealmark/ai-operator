@@ -28,7 +28,7 @@ body {
 
 /* ── Text gradient ─────────────────────────────────────────── */
 .text-gradient {
-  background: linear-gradient(135deg, #93c5fd 0%, #a5b4fc 50%, #c7d2fe 100%); /* Pastel blue gradient */
+  background: linear-gradient(135deg, #ff73a1 0%, #f9a8d4 50%, #fbcfe8 100%); /* Warm berry-pink gradient */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -309,8 +309,8 @@ body {
 .power-strip {
   display: flex;
   gap: 0;
-  background: rgba(147, 197, 253, 0.1);
-  border: 1px solid rgba(147, 197, 253, 0.2);
+  background: rgba(255, 115, 161, 0.07);
+  border: 1px solid rgba(255, 115, 161, 0.15);
   border-radius: 16px;
   overflow: hidden;
   max-width: 560px;
@@ -328,14 +328,14 @@ body {
 .power-number {
   font-size: 32px;
   font-weight: 800;
-  color: #3b82f6; /* Blue accent */
+  color: #f24a84; /* Berry pink */
   line-height: 1;
 }
 
 .power-suffix {
   font-size: 18px;
   font-weight: 700;
-  color: #3b82f6;
+  color: #f24a84;
   line-height: 1;
   display: inline;
 }
@@ -351,7 +351,7 @@ body {
 
 .power-divider {
   width: 1px;
-  background: rgba(147, 197, 253, 0.15);
+  background: rgba(255, 115, 161, 0.1);
   margin: 12px 0;
 }
 
@@ -360,7 +360,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  background: #3b82f6; /* Blue primary */
+  background: #ff73a1; /* Berry primary */
   color: #fff;
   font-weight: 700;
   font-size: 17px;
@@ -369,13 +369,13 @@ body {
   border: none;
   cursor: pointer;
   transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
-  box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 30px rgba(242, 74, 132, 0.25);
   white-space: nowrap;
 }
 
 .cta-primary:hover {
-  background: #60a5fa;
-  box-shadow: 0 0 50px rgba(147, 197, 253, 0.45);
+  background: #f9a8d4;
+  box-shadow: 0 0 50px rgba(249, 168, 212, 0.5);
   transform: translateY(-1px);
 }
 
@@ -397,8 +397,8 @@ body {
 }
 
 .cta-secondary:hover {
-  border-color: #3b82f6;
-  color: #1e40af;
+  border-color: #f24a84;
+  color: #be185d;
 }
 
 /* ── Before / After cards ──────────────────────────────────── */
@@ -410,7 +410,7 @@ body {
 }
 
 .after-card {
-  background: rgba(147, 197, 253, 0.1); /* Soft blue */
+  background: rgba(255, 115, 161, 0.07); /* Soft blue */
   border: 1px solid rgba(147, 197, 253, 0.25);
   border-radius: 24px;
   padding: 28px;
@@ -448,13 +448,13 @@ body {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: rgba(147, 197, 253, 0.15);
-  border: 1px solid rgba(147, 197, 253, 0.4);
+  background: rgba(255, 115, 161, 0.1);
+  border: 1px solid rgba(255, 115, 161, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  color: #3b82f6;
+  color: #f24a84;
   font-size: 15px;
 }
 
