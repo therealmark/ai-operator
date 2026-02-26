@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sidekick — Become Superhuman. Scale 100x.</title>
+  <meta name="description" content="Your AI sidekick gives you the engineering horsepower of an entire managed services company. Build anything. Ship everything. Scale without limits." />
+  <link rel="icon" type="image/svg+xml" href="/images/logo.svg" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body class="bg-zinc-950 text-zinc-50 overflow-x-hidden">
+
+  <!-- ─── HERO ─────────────────────────────────────────────── -->
+  <header class="relative min-h-screen flex flex-col justify-center border-b border-zinc-900 overflow-hidden">
+    <!-- Radial glow background -->
+    <div class="hero-glow" aria-hidden="true"></div>
+    <!-- Floating grid -->
+    <div class="hero-grid" aria-hidden="true"></div>
+
+    <div class="relative z-10 max-w-5xl mx-auto px-6 py-24 flex flex-col gap-10">
+
+      <!-- Eyebrow -->
+      <div class="flex items-center gap-3">
+        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <p class="uppercase tracking-[0.3em] text-sm text-emerald-400 font-medium">Sidekick — Private AI • Unlimited Power</p>
+      </div>
+
+      <!-- Headline -->
+      <div class="space-y-4">
+        <h1 class="text-5xl md:text-7xl font-extrabold leading-[1.05] tracking-tight">
+          You.<br/>
+          <span class="text-gradient">Superhuman.</span><br/>
+          <span class="text-zinc-400">100× scale.</span>
+        </h1>
+        <p class="text-xl md:text-2xl text-zinc-300 max-w-2xl leading-relaxed">
+          One sidekick. The engineering muscle of an entire managed services company — running 24/7, answerable only to you, ready to turn every wild idea into shipped reality.
+        </p>
+      </div>
+
+      <!-- Animated terminal -->
+      <div class="terminal-window max-w-2xl">
+        <div class="terminal-bar">
+          <span class="dot dot-red"></span>
+          <span class="dot dot-yellow"></span>
+          <span class="dot dot-green"></span>
+          <span class="terminal-title">sidekick — live</span>
+        </div>
+        <div class="terminal-body">
+          <div class="terminal-line"><span class="terminal-prompt">▸</span> <span id="task-line" class="terminal-task"></span><span class="terminal-cursor">█</span></div>
+          <div class="terminal-status" id="status-line"></div>
+        </div>
+      </div>
+
+      <!-- Power counter strip -->
+      <div class="power-strip">
+        <div class="power-stat">
+          <span class="power-number" data-target="100">0</span><span class="power-suffix">×</span>
+          <span class="power-label">Output Multiplier</span>
+        </div>
+        <div class="power-divider"></div>
+        <div class="power-stat">
+          <span class="power-number" data-target="24">0</span><span class="power-suffix">/7</span>
+          <span class="power-label">Always On</span>
+        </div>
+        <div class="power-divider"></div>
+        <div class="power-stat">
+          <span class="power-number" data-target="1">0</span><span class="power-suffix"> person</span>
+          <span class="power-label">= Full Engineering Firm</span>
+        </div>
+      </div>
+
+      <!-- CTAs -->
+      <div class="flex flex-col sm:flex-row gap-4">
+        <button class="cta-primary" data-checkout="sidekick-kit">
+          Unlock Your Sidekick
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <a href="https://calendar.app.google/tN2C8hnMdvQDa8Vf7" target="_blank" rel="noopener" class="cta-secondary">
+          Talk to us first
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-6 py-20 space-y-28">
+
+    <!-- ─── TRANSFORMATION SECTION ────────────────────────── -->
+    <section class="space-y-12">
+      <div class="text-center space-y-4 max-w-3xl mx-auto">
+        <p class="uppercase tracking-[0.3em] text-sm text-emerald-400">The shift</p>
+        <h2 class="text-4xl md:text-5xl font-bold">Stop trading hours for output.</h2>
+        <p class="text-zinc-300 text-lg">Most people are limited by the hours in the day and the skills they have. Sidekick removes both ceilings. It doesn't just help — it amplifies every decision you make, every project you launch, every system you build.</p>
+      </div>
+
+      <!-- Before / After -->
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="before-card">
+          <p class="text-zinc-500 uppercase tracking-widest text-xs mb-4">Without Sidekick</p>
+          <ul class="space-y-3 text-zinc-400">
+            <li class="flex gap-3 items-start"><span class="text-red-500 mt-0.5">✕</span> Hiring engineers takes months and costs a fortune</li>
+            <li class="flex gap-3 items-start"><span class="text-red-500 mt-0.5">✕</span> Ideas die waiting for bandwidth</li>
+            <li class="flex gap-3 items-start"><span class="text-red-500 mt-0.5">✕</span> Growth is bottlenecked by what one person can do</li>
+            <li class="flex gap-3 items-start"><span class="text-red-500 mt-0.5">✕</span> Operations eat strategy alive</li>
+            <li class="flex gap-3 items-start"><span class="text-red-500 mt-0.5">✕</span> Competitors with bigger teams move faster</li>
+          </ul>
+        </div>
+        <div class="after-card">
+          <p class="text-emerald-400 uppercase tracking-widest text-xs mb-4">With Sidekick</p>
+          <ul class="space-y-3 text-zinc-200">
+            <li class="flex gap-3 items-start"><span class="text-emerald-400 mt-0.5">▸</span> Full engineering capability on demand, zero hiring</li>
+            <li class="flex gap-3 items-start"><span class="text-emerald-400 mt-0.5">▸</span> Every idea ships — fast, tested, documented</li>
+            <li class="flex gap-3 items-start"><span class="text-emerald-400 mt-0.5">▸</span> Scale operations and revenue without adding headcount</li>
+            <li class="flex gap-3 items-start"><span class="text-emerald-400 mt-0.5">▸</span> Sidekick handles ops while you focus on vision</li>
+            <li class="flex gap-3 items-start"><span class="text-emerald-400 mt-0.5">▸</span> You move faster than teams 10× your size</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── SUPERPOWERS SECTION ────────────────────────────── -->
+    <section class="space-y-10">
+      <div class="space-y-3">
+        <p class="uppercase tracking-[0.3em] text-sm text-emerald-400">Your new superpowers</p>
+        <h2 class="text-4xl font-bold">What you can do now.</h2>
+        <p class="text-zinc-300 text-lg max-w-2xl">These aren't features. They're capabilities you simply didn't have before — the kind that used to require an entire department.</p>
+      </div>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="power-card">
+          <div class="power-icon">🚀</div>
+          <h4 class="text-xl font-semibold">Ship at Startup Speed</h4>
+          <p class="text-zinc-300 mt-2">Design, build, test, and deploy new products and features while your competition is still in standups. Your sidekick is the entire dev team.</p>
+        </div>
+        <div class="power-card">
+          <div class="power-icon">⚡</div>
+          <h4 class="text-xl font-semibold">Infinite Ideas, Zero Bottlenecks</h4>
+          <p class="text-zinc-300 mt-2">No more "we'll get to it." Your wildest ideas get scoped, prototyped, and validated in hours — not quarters. The backlog ends here.</p>
+        </div>
+        <div class="power-card">
+          <div class="power-icon">🏗️</div>
+          <h4 class="text-xl font-semibold">MSP-Grade Infrastructure</h4>
+          <p class="text-zinc-300 mt-2">Auto-scaling cloud, security hardening, monitoring, backups, CI/CD — the kind of operations stack a managed services company charges thousands a month for. Yours.</p>
+        </div>
+        <div class="power-card">
+          <div class="power-icon">📈</div>
+          <h4 class="text-xl font-semibold">Scale Revenue, Not Headcount</h4>
+          <p class="text-zinc-300 mt-2">Build revenue-generating systems — automations, pipelines, integrations — that compound over time. Sidekick runs the engine while you steer the ship.</p>
+        </div>
+        <div class="power-card">
+          <div class="power-icon">🧠</div>
+          <h4 class="text-xl font-semibold">Institutional-Grade Intelligence</h4>
+          <p class="text-zinc-300 mt-2">Research, analysis, competitive intel, strategy synthesis — done before your first coffee. Make decisions like a CEO with a full strategy team behind them.</p>
+        </div>
+        <div class="power-card">
+          <div class="power-icon">🔒</div>
+          <h4 class="text-xl font-semibold">Private. Sovereign. Yours.</h4>
+          <p class="text-zinc-300 mt-2">Runs on your hardware. Your data, your IP, your sidekick. No SaaS middleman reading your business strategy. The power without the exposure.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── HOW IT WORKS ───────────────────────────────────── -->
+    <section class="space-y-10">
+      <div class="space-y-3">
+        <p class="uppercase tracking-[0.3em] text-sm text-emerald-400">How it works</p>
+        <h2 class="text-4xl font-bold">From zero to superhuman in two weeks.</h2>
+        <p class="text-zinc-300 text-lg max-w-2xl">We build your sidekick together. You walk away owning a private AI command center — not a subscription to someone else's platform.</p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-10 items-start">
+        <ol class="space-y-6">
+          <li class="timeline-item">
+            <div class="timeline-num">1</div>
+            <div>
+              <h4 class="font-semibold text-lg">Power Mapping</h4>
+              <p class="text-zinc-400 mt-1">We map your biggest growth levers — the workflows and capabilities that will create the most impact, fast. Then we build those first.</p>
+            </div>
+          </li>
+          <li class="timeline-item">
+            <div class="timeline-num">2</div>
+            <div>
+              <h4 class="font-semibold text-lg">Install + Arm</h4>
+              <p class="text-zinc-400 mt-1">Stack is deployed on your machine. Sidekick goes live with your channels, your data, your context. No black boxes — you see everything.</p>
+            </div>
+          </li>
+          <li class="timeline-item">
+            <div class="timeline-num">3</div>
+            <div>
+              <h4 class="font-semibold text-lg">Build Your Arsenal</h4>
+              <p class="text-zinc-400 mt-1">We build out your highest-leverage capabilities together — automation pipelines, intelligence workflows, dev tooling. Custom to your actual business goals.</p>
+            </div>
+          </li>
+          <li class="timeline-item">
+            <div class="timeline-num">4</div>
+            <div>
+              <h4 class="font-semibold text-lg">Activate &amp; Scale</h4>
+              <p class="text-zinc-400 mt-1">Sidekick goes fully live. You own every line of it. From here, the only limit is how big you're willing to think.</p>
+            </div>
+          </li>
+        </ol>
+        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 space-y-6">
+          <h3 class="text-xl font-semibold">What's included</h3>
+          <ul class="space-y-3 text-zinc-300">
+            <li class="flex gap-3"><span class="text-emerald-400">▸</span> Private OpenClaw + Ollama command center</li>
+            <li class="flex gap-3"><span class="text-emerald-400">▸</span> Custom automation arsenal (your workflows, your rules)</li>
+            <li class="flex gap-3"><span class="text-emerald-400">▸</span> Production-grade security, backups &amp; monitoring</li>
+            <li class="flex gap-3"><span class="text-emerald-400">▸</span> Two weeks of 1:1 build sessions</li>
+            <li class="flex gap-3"><span class="text-emerald-400">▸</span> Sidekick growth roadmap — where to scale next</li>
+            <li class="flex gap-3"><span class="text-emerald-400">▸</span> Everything recorded. Yours forever.</li>
+          </ul>
+          <div class="border-t border-zinc-800 pt-4">
+            <p class="text-sm text-zinc-500">Week 1 — Stack + core capability build</p>
+            <p class="text-sm text-zinc-500">Week 2 — Custom power workflows + live activation</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── SOCIAL PROOF / VISION ─────────────────────────── -->
+    <section class="vision-section">
+      <div class="space-y-6 max-w-3xl">
+        <p class="text-emerald-400 text-5xl">"</p>
+        <p class="text-2xl md:text-3xl font-semibold leading-snug">Imagine having a world-class CTO, a team of senior engineers, a data analyst, and an ops director — all working for you, right now, for the price of a few dinners.</p>
+        <p class="text-zinc-400">That's not a metaphor. That's what Sidekick is.</p>
+      </div>
+    </section>
+
+    <!-- ─── CTA SECTION ───────────────────────────────────── -->
+    <section class="cta-section">
+      <p class="text-sm uppercase tracking-[0.3em] text-emerald-300">Early access</p>
+      <h2 class="text-4xl md:text-5xl font-bold text-white">Your sidekick is waiting.</h2>
+      <p class="text-xl text-emerald-100 max-w-xl">Unlock the starter kit. We'll build the rest together. Two weeks from now, you'll have capabilities you didn't think were possible for one person.</p>
+      <div class="flex flex-col sm:flex-row gap-4">
+        <button class="cta-primary" data-checkout="sidekick-kit">
+          Unlock Your Sidekick — $25
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <a href="#faq" class="border border-emerald-500/50 text-emerald-200 px-6 py-4 rounded-2xl text-lg flex items-center justify-center hover:border-emerald-400 transition-colors">Questions? See the FAQ</a>
+      </div>
+      <p class="text-sm text-emerald-400/60">Pay once. Own it forever. No subscriptions.</p>
+    </section>
+
+    <!-- ─── FAQ ───────────────────────────────────────────── -->
+    <section id="faq" class="space-y-6">
+      <h2 class="text-3xl font-bold">FAQ</h2>
+      <div class="space-y-4 text-zinc-300">
+        <details class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5" open>
+          <summary class="font-semibold cursor-pointer text-white">Do I need to be technical?</summary>
+          <p class="mt-3 text-zinc-400">Not at all. The starter kit is ready to run, and we pair with you live through every step. Plenty of our most powerful users aren't developers — they're founders, operators, and creators who just want to move faster.</p>
+        </details>
+        <details class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+          <summary class="font-semibold cursor-pointer text-white">What kind of things can Sidekick actually build or run?</summary>
+          <p class="mt-3 text-zinc-400">Infrastructure deployments, custom integrations, data pipelines, competitive analysis, content engines, automated reporting, client-facing tooling, internal ops systems — anything with a computer on both ends. We scope your highest-impact use cases first.</p>
+        </details>
+        <details class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+          <summary class="font-semibold cursor-pointer text-white">Why is my data private?</summary>
+          <p class="mt-3 text-zinc-400">Your sidekick runs on your machine. Nothing you feed it — business strategy, client data, IP — goes through a third-party cloud. You get AI-grade intelligence with zero data exposure.</p>
+        </details>
+        <details class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+          <summary class="font-semibold cursor-pointer text-white">What happens after the two weeks?</summary>
+          <p class="mt-3 text-zinc-400">You own the entire stack. We give you a growth roadmap — the next capabilities to build, the next systems to automate. You expand it on your own terms. Some clients keep working with us monthly; others fly solo. Both are wins.</p>
+        </details>
+        <details class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+          <summary class="font-semibold cursor-pointer text-white">Why $25?</summary>
+          <p class="mt-3 text-zinc-400">This is an early-access release. The $25 covers kit delivery and keeps the program open-source. The real value is the 1:1 build time and the sidekick you walk away with — which would cost thousands a month from any managed services provider.</p>
+        </details>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="border-t border-zinc-900 py-10 text-center space-y-2">
+    <p class="text-zinc-400 text-sm">© 2026 Sidekick — Powered by <a href="https://securebydezign.com" class="text-emerald-400 hover:underline">Secure by Dezign</a></p>
+    <p class="text-zinc-600 text-xs">Your stack. Your data. Your rules.</p>
+  </footer>
+
+  <script src="/js/stripe-checkout.js" defer></script>
+  <script>
+    // ─── Terminal animation ──────────────────────────────────
+    const tasks = [
+      { text: "Deploying auto-scaling cloud infrastructure...",        status: "✓ Done in 4.2s" },
+      { text: "Analyzing 6 months of competitor pricing data...",      status: "✓ Report ready" },
+      { text: "Building automated revenue reporting pipeline...",      status: "✓ Live — runs nightly" },
+      { text: "Drafting product roadmap from 47 customer notes...",    status: "✓ Strategic brief generated" },
+      { text: "Spinning up staging environment + CI/CD...",           status: "✓ Deploy pipeline active" },
+      { text: "Researching enterprise integration partners...",        status: "✓ 12 leads qualified" },
+      { text: "Optimizing database queries across 3 services...",      status: "✓ 3× faster" },
+      { text: "Generating investor update from last quarter...",       status: "✓ Ready to send" },
+    ];
+
+    let taskIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+    let statusTimeout;
+
+    const taskLine = document.getElementById('task-line');
+    const statusLine = document.getElementById('status-line');
+
+    function typeTask() {
+      const current = tasks[taskIndex];
+
+      if (!isDeleting) {
+        taskLine.textContent = current.text.slice(0, charIndex + 1);
+        charIndex++;
+        if (charIndex === current.text.length) {
+          // Show status, pause, then start deleting
+          statusTimeout = setTimeout(() => {
+            statusLine.textContent = current.status;
+            statusLine.classList.add('visible');
+            setTimeout(() => {
+              isDeleting = true;
+              statusLine.classList.remove('visible');
+              setTimeout(() => { statusLine.textContent = ''; }, 300);
+              requestAnimationFrame(() => setTimeout(typeTask, 50));
+            }, 2200);
+          }, 400);
+          return;
+        }
+      } else {
+        taskLine.textContent = current.text.slice(0, charIndex - 1);
+        charIndex--;
+        if (charIndex === 0) {
+          isDeleting = false;
+          taskIndex = (taskIndex + 1) % tasks.length;
+        }
+      }
+
+      const speed = isDeleting ? 18 : 38;
+      setTimeout(typeTask, speed);
+    }
+
+    typeTask();
+
+    // ─── Counter animation ───────────────────────────────────
+    function animateCounter(el) {
+      const target = parseInt(el.dataset.target, 10);
+      const duration = 1800;
+      const start = performance.now();
+      function step(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.floor(ease * target);
+        if (progress < 1) requestAnimationFrame(step);
+        else el.textContent = target;
+      }
+      requestAnimationFrame(step);
+    }
+
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.querySelectorAll('[data-target]').forEach(animateCounter);
+          counterObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+
+    const powerStrip = document.querySelector('.power-strip');
+    if (powerStrip) counterObserver.observe(powerStrip);
+  </script>
+</body>
+</html>
