@@ -91,6 +91,7 @@ body {
 .iphone-frame {
   position: relative;
   width: 280px;
+  height: 588px; /* ~2.1:1 ratio — iPhone 15 Pro proportions */
   background: linear-gradient(160deg, #2a2a2a 0%, #1a1a1a 100%);
   border-radius: 46px;
   border: 2px solid #444;
@@ -120,6 +121,9 @@ body {
   border-radius: 34px;
   overflow: hidden;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* allow flex child to shrink */
 }
 
 .iphone-home-indicator {
@@ -142,6 +146,10 @@ body {
 .imessage-window {
   background: #fff;
   width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   font-family: -apple-system, 'SF Pro Text', BlinkMacSystemFont, sans-serif;
 }
 
@@ -152,6 +160,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 .imessage-avatar {
@@ -179,8 +188,8 @@ body {
 
 .imessage-body {
   padding: 14px 12px;
-  min-height: 190px;
-  max-height: 190px;
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 7px;
@@ -251,6 +260,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .imessage-inputbar {
