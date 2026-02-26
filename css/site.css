@@ -193,8 +193,14 @@ body {
   display: flex;
   flex-direction: column;
   gap: 7px;
-  overflow: hidden;
+  overflow-y: auto;
   background: #fff;
+  /* Hide scrollbar across all browsers */
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* IE / Edge */
+}
+.imessage-body::-webkit-scrollbar {
+  display: none;                /* Chrome / Safari / WebKit */
 }
 
 .chat-bubble {
