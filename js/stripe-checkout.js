@@ -4,11 +4,11 @@
  */
 (() => {
   const TEST = {
-    'sidekick-kit': 'https://buy.stripe.com/28EfZg1ICbTWfzqeGZb7y0b',
+    'sidekick-kit': 'https://buy.stripe.com/test_fZucN48gV26adLccXseME0a',
   };
 
   const LIVE = {
-    'sidekick-kit': 'https://buy.stripe.com/8x2cN42MG8HK2ME7exb7y0c',
+    'sidekick-kit': 'https://buy.stripe.com/28EfZg1ICbTWfzqeGZb7y0b',
   };
 
   const useTest = window.location.hostname === 'localhost' ||
