@@ -40,7 +40,6 @@ body {
 
 /* ── iPhone Frame ──────────────────────────────────────────── */
 .iphone-outer {
-  position: relative;
   display: inline-block;
   flex-shrink: 0;
 }
