@@ -1,21 +1,25 @@
+/**
+ * Sidekick — Stripe Payment Links
+ * Uses test links on localhost or when URL has ?test=1; otherwise live.
+ */
 (() => {
-  // TODO: replace the test link once a Stripe test key is available.
-  const PAYMENT_LINKS = {
-    test: 'https://buy.stripe.com/cNi3cugDw9LOevmbuNb7y09',
-    live: 'https://buy.stripe.com/cNi3cugDw9LOevmbuNb7y09'
+  const TEST = {
+    'sidekick-kit': 'https://buy.stripe.com/28EfZg1ICbTWfzqeGZb7y0b',
   };
 
-  const params = new URLSearchParams(window.location.search);
-  let mode = window.location.hostname === 'localhost' || params.get('test') === '1' ? 'test' : 'live';
+  const LIVE = {
+    'sidekick-kit': 'https://buy.stripe.com/8x2cN42MG8HK2ME7exb7y0c',
+  };
 
-  document.querySelectorAll('[data-checkout="sidekick-kit"]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const url = PAYMENT_LINKS[mode];
-      if (!url || url.includes('dummy')) {
-        alert('Payment link not configured yet.');
-        return;
-      }
-      window.location.href = url;
-    });
+  const useTest = window.location.hostname === 'localhost' ||
+                  new URLSearchParams(window.location.search).get('test') === '1';
+
+  const links = useTest ? TEST : LIVE;
+
+  document.querySelectorAll('[data-checkout]').forEach(btn => {
+    const slug = btn.getAttribute('data-checkout');
+    const url  = links[slug];
+    if (!url) return;
+    btn.addEventListener('click', () => { window.location.href = url; });
   });
 })();
