@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Operator — Customers</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background: #0f172a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px; }
+    .stat-num { font-size: 2.25rem; font-weight: 800; line-height: 1; }
+    #loader { position: fixed; inset: 0; background: #0f172a; display: flex; align-items: center; justify-content: center; z-index: 50; font-size: 1.25rem; color: #64748b; }
+    .tag { display: inline-block; background: #1e3a5f; color: #7dd3fc; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 6px; margin: 1px; }
+    tr:hover td { background: rgba(255,255,255,0.03); }
+    th { cursor: pointer; user-select: none; }
+    th:hover { color: #e2e8f0; }
+    .sort-asc::after  { content: ' ↑'; color: #ec4899; }
+    .sort-desc::after { content: ' ↓'; color: #ec4899; }
+    input[type=text] { background: #1e293b; border: 1px solid #334155; color: #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 14px; outline: none; }
+    input[type=text]:focus { border-color: #ec4899; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; background: #1e293b; border: 1px solid #334155; color: #94a3b8; border-radius: 8px; padding: 7px 14px; font-size: 13px; cursor: pointer; transition: all .15s; }
+    .btn:hover { border-color: #ec4899; color: #ec4899; }
+  </style>
+</head>
+<body>
+
+<div id="loader">Loading customers…</div>
+
+<div id="app" class="hidden max-w-7xl mx-auto px-6 py-10 space-y-8">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between flex-wrap gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,#ec4899,#a855f7)">
+        <svg width="16" height="16" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg>
+      </div>
+      <h1 class="text-xl font-bold text-white">AI Operator — Customers</h1>
+    </div>
+    <div class="flex items-center gap-3">
+      <span id="last-updated" class="text-xs text-slate-500"></span>
+      <button class="btn" onclick="exportCSV()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export CSV
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="summary-cards"></div>
+
+  <!-- Search + table -->
+  <div class="card space-y-4">
+    <div class="flex items-center gap-3 flex-wrap">
+      <input type="text" id="search" placeholder="Search by name, email, or business…" oninput="filterTable()" class="flex-1 min-w-48" />
+      <span id="row-count" class="text-xs text-slate-500 whitespace-nowrap"></span>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-xs text-slate-500 border-b border-slate-700">
+            <th class="text-left pb-3 pr-4 font-semibold" onclick="sortBy('name')" id="th-name">Name</th>
+            <th class="text-left pb-3 pr-4 font-semibold" onclick="sortBy('email')" id="th-email">Email</th>
+            <th class="text-left pb-3 pr-4 font-semibold" onclick="sortBy('businessName')" id="th-businessName">Business</th>
+            <th class="text-left pb-3 pr-4 font-semibold">Products</th>
+            <th class="text-right pb-3 pr-4 font-semibold" onclick="sortBy('purchaseCount')" id="th-purchaseCount"># Purchases</th>
+            <th class="text-left pb-3 pr-4 font-semibold" onclick="sortBy('firstPurchaseAt')" id="th-firstPurchaseAt">First Purchase</th>
+            <th class="text-left pb-3 font-semibold" onclick="sortBy('lastPurchaseAt')" id="th-lastPurchaseAt">Last Purchase</th>
+          </tr>
+        </thead>
+        <tbody id="customer-rows" class="divide-y divide-slate-800/60"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API = 'https://z01mzuzo05.execute-api.us-east-1.amazonaws.com/prod/api/customers';
+const KEY = '2c9a66158ebeb785fea45ccc47af61d1fa6f02be9f380a4d';
+
+let allCustomers = [];
+let sortField = 'lastPurchaseAt';
+let sortDir = 'desc';
+
+function fmt(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function fmtProduct(p) {
+  // Strip file extensions and format nicely
+  return p.replace(/\.zip$|\.pdf$/, '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+async function load() {
+  try {
+    const res = await fetch(API, { headers: { 'x-metrics-key': KEY } });
+    if (!res.ok) {
+      document.getElementById('loader').textContent = res.status === 401 ? 'Access denied.' : 'Failed to load.';
+      return;
+    }
+    const data = await res.json();
+    allCustomers = data.customers || [];
+    renderSummary(data.summary);
+    renderTable();
+    document.getElementById('loader').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+  } catch (e) {
+    document.getElementById('loader').textContent = 'Failed to connect.';
+  }
+}
+
+function renderSummary(s) {
+  const topProduct = s.topProducts?.[0];
+  const cards = [
+    { label: 'Total Customers', value: s.totalCustomers, sub: 'unique buyers' },
+    { label: 'Total Purchases', value: s.totalPurchases, sub: 'across all customers' },
+    { label: 'Top Product', value: topProduct ? topProduct.count : '—', sub: topProduct ? fmtProduct(topProduct.name) : 'none yet' },
+    { label: 'Avg Purchases', value: s.totalCustomers ? (s.totalPurchases / s.totalCustomers).toFixed(1) : '0', sub: 'per customer' },
+  ];
+  document.getElementById('summary-cards').innerHTML = cards.map(c => `
+    <div class="card">
+      <div class="stat-num text-white">${c.value}</div>
+      <div class="text-xs text-slate-400 mt-1">${c.label}</div>
+      <div class="text-xs text-slate-500 mt-1">${c.sub}</div>
+    </div>
+  `).join('');
+}
+
+function filterTable() {
+  renderTable();
+}
+
+function sortBy(field) {
+  if (sortField === field) {
+    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortField = field;
+    sortDir = field === 'purchaseCount' ? 'desc' : 'asc';
+  }
+  renderTable();
+}
+
+function renderTable() {
+  const search = document.getElementById('search').value.toLowerCase().trim();
+  let rows = allCustomers.filter(c => {
+    if (!search) return true;
+    return (c.email || '').toLowerCase().includes(search) ||
+           (c.name || '').toLowerCase().includes(search) ||
+           (c.businessName || '').toLowerCase().includes(search);
+  });
+
+  // Sort
+  rows.sort((a, b) => {
+    let va = a[sortField] ?? '';
+    let vb = b[sortField] ?? '';
+    if (sortField === 'purchaseCount') {
+      va = Number(va); vb = Number(vb);
+      return sortDir === 'asc' ? va - vb : vb - va;
+    }
+    return sortDir === 'asc' ? String(va).localeCompare(String(vb)) : String(vb).localeCompare(String(va));
+  });
+
+  // Update sort indicators
+  ['name','email','businessName','purchaseCount','firstPurchaseAt','lastPurchaseAt'].forEach(f => {
+    const th = document.getElementById('th-' + f);
+    if (!th) return;
+    th.className = th.className.replace(/\s*sort-(asc|desc)/g, '');
+    if (f === sortField) th.classList.add('sort-' + sortDir);
+  });
+
+  document.getElementById('row-count').textContent = `${rows.length} customer${rows.length !== 1 ? 's' : ''}`;
+
+  document.getElementById('customer-rows').innerHTML = rows.length === 0
+    ? `<tr><td colspan="7" class="py-8 text-center text-slate-500 text-sm">No customers yet${search ? ' matching your search' : ''}.</td></tr>`
+    : rows.map(c => {
+        const products = Array.isArray(c.products)
+          ? c.products.map(p => `<span class="tag">${fmtProduct(p)}</span>`).join('')
+          : (c.products ? `<span class="tag">${fmtProduct(String(c.products))}</span>` : '—');
+        return `
+          <tr class="text-slate-400 transition-colors">
+            <td class="py-3 pr-4 font-medium text-slate-200">${c.name || '—'}</td>
+            <td class="py-3 pr-4 text-xs font-mono text-slate-300">${c.email}</td>
+            <td class="py-3 pr-4 text-slate-400">${c.businessName || '<span class="text-slate-600 italic">—</span>'}</td>
+            <td class="py-3 pr-4">${products}</td>
+            <td class="py-3 pr-4 text-right font-semibold text-white">${c.purchaseCount || 0}</td>
+            <td class="py-3 pr-4 text-xs text-slate-500">${fmt(c.firstPurchaseAt)}</td>
+            <td class="py-3 text-xs text-slate-500">${fmt(c.lastPurchaseAt)}</td>
+          </tr>
+        `;
+      }).join('');
+}
+
+function exportCSV() {
+  const search = document.getElementById('search').value.toLowerCase().trim();
+  let rows = allCustomers.filter(c => {
+    if (!search) return true;
+    return (c.email || '').toLowerCase().includes(search) ||
+           (c.name || '').toLowerCase().includes(search) ||
+           (c.businessName || '').toLowerCase().includes(search);
+  });
+
+  const headers = ['Name', 'Email', 'Business', 'Products', 'Purchase Count', 'First Purchase', 'Last Purchase'];
+  const csvRows = [headers.join(',')];
+  rows.forEach(c => {
+    const products = Array.isArray(c.products) ? c.products.join('; ') : (c.products || '');
+    csvRows.push([
+      `"${(c.name || '').replace(/"/g, '""')}"`,
+      `"${(c.email || '').replace(/"/g, '""')}"`,
+      `"${(c.businessName || '').replace(/"/g, '""')}"`,
+      `"${products.replace(/"/g, '""')}"`,
+      c.purchaseCount || 0,
+      fmt(c.firstPurchaseAt),
+      fmt(c.lastPurchaseAt),
+    ].join(','));
+  });
+
+  const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `ai-operator-customers-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+load();
+setInterval(load, 120000); // auto-refresh every 2 minutes
+</script>
+</body>
+</html>
