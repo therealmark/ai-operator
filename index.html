@@ -94,14 +94,21 @@ function bar(pct, color = '#ec4899') {
   return `<div style="background:#1e293b;border-radius:4px;height:6px;width:100%;margin-top:4px"><div style="background:${color};border-radius:4px;height:6px;width:${pct}%"></div></div>`;
 }
 
+const charts = {};
+
 async function load() {
-  const res = await fetch(API, { headers: { 'x-metrics-key': KEY } });
-  if (!res.ok) { document.getElementById('loader').textContent = 'Failed to load data.'; return; }
-  const data = await res.json();
-  render(data);
-  document.getElementById('loader').classList.add('hidden');
-  document.getElementById('app').classList.remove('hidden');
-  document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+  try {
+    const res = await fetch(API, { headers: { 'x-metrics-key': KEY } });
+    if (!res.ok) { document.getElementById('loader').textContent = `Error ${res.status}: ${res.statusText}`; return; }
+    const data = await res.json();
+    render(data);
+    document.getElementById('loader').style.display = 'none';
+    document.getElementById('app').classList.remove('hidden');
+    document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+  } catch (e) {
+    document.getElementById('loader').textContent = 'Error: ' + e.message;
+    console.error('[metrics] load error', e);
+  }
 }
 
 function render(d) {
@@ -123,7 +130,8 @@ function render(d) {
   `).join('');
 
   // Device chart
-  new Chart(document.getElementById('deviceChart'), {
+  if (charts.device) charts.device.destroy();
+  charts.device = new Chart(document.getElementById('deviceChart'), {
     type: 'doughnut',
     data: {
       labels: d.devices.map(x => x.name),
@@ -135,7 +143,8 @@ function render(d) {
   // Click chart
   const clickLabels = Object.keys(d.clicks);
   const clickVals   = Object.values(d.clicks);
-  new Chart(document.getElementById('clickChart'), {
+  if (charts.click) charts.click.destroy();
+  charts.click = new Chart(document.getElementById('clickChart'), {
     type: 'bar',
     data: {
       labels: clickLabels,
