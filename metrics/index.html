@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Operator — Metrics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <style>
+    body { background: #0f172a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px; }
+    .stat-num { font-size: 2.25rem; font-weight: 800; line-height: 1; }
+    .badge { display: inline-block; background: #0ea5e9; color: white; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: .05em; }
+    .dot-new { background: #4ade80; }
+    .dot-ret { background: #fb923c; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+    #loader { position: fixed; inset: 0; background: #0f172a; display: flex; align-items: center; justify-content: center; z-index: 50; font-size: 1.25rem; color: #64748b; }
+  </style>
+</head>
+<body>
+
+<div id="loader">Loading analytics…</div>
+
+<div id="app" class="hidden max-w-7xl mx-auto px-6 py-10 space-y-8">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,#ec4899,#a855f7)">
+        <svg width="16" height="16" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 3v18"/></svg>
+      </div>
+      <h1 class="text-xl font-bold text-white">AI Operator Metrics</h1>
+    </div>
+    <div id="last-updated" class="text-xs text-slate-500"></div>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="summary-cards"></div>
+
+  <!-- Charts row -->
+  <div class="grid md:grid-cols-3 gap-4">
+    <div class="card"><h3 class="text-sm font-semibold text-slate-400 mb-4">Devices</h3><canvas id="deviceChart" height="180"></canvas></div>
+    <div class="card"><h3 class="text-sm font-semibold text-slate-400 mb-4">CTA Clicks</h3><canvas id="clickChart" height="180"></canvas></div>
+    <div class="card"><h3 class="text-sm font-semibold text-slate-400 mb-4">Top Countries</h3><div id="countries-list" class="space-y-2 text-sm"></div></div>
+  </div>
+
+  <!-- Referrers + UTM -->
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="card">
+      <h3 class="text-sm font-semibold text-slate-400 mb-4">Top Referrers</h3>
+      <div id="referrers-list" class="space-y-2 text-sm"></div>
+    </div>
+    <div class="card">
+      <h3 class="text-sm font-semibold text-slate-400 mb-4">UTM Sources</h3>
+      <div id="utm-list" class="space-y-2 text-sm"></div>
+    </div>
+  </div>
+
+  <!-- Recent sessions -->
+  <div class="card">
+    <h3 class="text-sm font-semibold text-slate-400 mb-4">Recent Sessions</h3>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-xs text-slate-500 border-b border-slate-700">
+            <th class="text-left pb-2 pr-4">Time</th>
+            <th class="text-left pb-2 pr-4">Session</th>
+            <th class="text-left pb-2 pr-4">Status</th>
+            <th class="text-left pb-2 pr-4">Device</th>
+            <th class="text-left pb-2 pr-4">Country</th>
+            <th class="text-left pb-2 pr-4">Referrer</th>
+            <th class="text-left pb-2 pr-4">UTM</th>
+            <th class="text-left pb-2 pr-4">Duration</th>
+            <th class="text-left pb-2">Scroll</th>
+          </tr>
+        </thead>
+        <tbody id="session-rows" class="divide-y divide-slate-800"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API = 'https://z01mzuzo05.execute-api.us-east-1.amazonaws.com/prod/api/analytics';
+const KEY = '2c9a66158ebeb785fea45ccc47af61d1fa6f02be9f380a4d';
+
+function fmt(ts) {
+  const d = new Date(ts);
+  return d.toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+function bar(pct, color = '#ec4899') {
+  return `<div style="background:#1e293b;border-radius:4px;height:6px;width:100%;margin-top:4px"><div style="background:${color};border-radius:4px;height:6px;width:${pct}%"></div></div>`;
+}
+
+async function load() {
+  const res = await fetch(API, { headers: { 'x-metrics-key': KEY } });
+  if (!res.ok) { document.getElementById('loader').textContent = 'Failed to load data.'; return; }
+  const data = await res.json();
+  render(data);
+  document.getElementById('loader').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+}
+
+function render(d) {
+  const s = d.summary;
+
+  // Summary cards
+  const cards = [
+    { label: 'Total Sessions',    value: s.totalSessions, sub: `${s.newVisitors} new visitors` },
+    { label: 'Total Events',      value: s.totalEvents,   sub: 'page views + interactions' },
+    { label: 'Avg Time on Page',  value: s.avgDuration + 's', sub: 'before leaving' },
+    { label: 'CTA Click Rate',    value: s.ctaRate + '%',  sub: `${s.ctaClicks} total clicks` },
+  ];
+  document.getElementById('summary-cards').innerHTML = cards.map(c => `
+    <div class="card">
+      <div class="stat-num text-white">${c.value}</div>
+      <div class="text-xs text-slate-400 mt-1">${c.label}</div>
+      <div class="text-xs text-slate-500 mt-1">${c.sub}</div>
+    </div>
+  `).join('');
+
+  // Device chart
+  new Chart(document.getElementById('deviceChart'), {
+    type: 'doughnut',
+    data: {
+      labels: d.devices.map(x => x.name),
+      datasets: [{ data: d.devices.map(x => x.count), backgroundColor: ['#ec4899','#a855f7','#0ea5e9','#22d3ee'] }]
+    },
+    options: { plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } } } }
+  });
+
+  // Click chart
+  const clickLabels = Object.keys(d.clicks);
+  const clickVals   = Object.values(d.clicks);
+  new Chart(document.getElementById('clickChart'), {
+    type: 'bar',
+    data: {
+      labels: clickLabels,
+      datasets: [{ data: clickVals, backgroundColor: '#a855f7', borderRadius: 4 }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: { x: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }, y: { ticks: { color: '#64748b' }, grid: { color: '#334155' } } }
+    }
+  });
+
+  // Countries
+  const maxC = d.countries[0]?.count || 1;
+  document.getElementById('countries-list').innerHTML = d.countries.map(c => `
+    <div>
+      <div class="flex justify-between"><span class="text-slate-300">${c.name || 'Unknown'}</span><span class="text-slate-500">${c.count}</span></div>
+      ${bar(Math.round((c.count / maxC) * 100), '#0ea5e9')}
+    </div>`).join('') || '<p class="text-slate-500 text-xs">No data yet</p>';
+
+  // Referrers
+  const maxR = d.referrers[0]?.count || 1;
+  document.getElementById('referrers-list').innerHTML = d.referrers.map(r => `
+    <div>
+      <div class="flex justify-between"><span class="text-slate-300">${r.name || 'Direct'}</span><span class="text-slate-500">${r.count}</span></div>
+      ${bar(Math.round((r.count / maxR) * 100))}
+    </div>`).join('') || '<p class="text-slate-500 text-xs">No data yet</p>';
+
+  // UTM
+  const maxU = d.utmSources[0]?.count || 1;
+  document.getElementById('utm-list').innerHTML = d.utmSources.map(u => `
+    <div>
+      <div class="flex justify-between"><span class="text-slate-300">${u.name}</span><span class="text-slate-500">${u.count}</span></div>
+      ${bar(Math.round((u.count / maxU) * 100), '#4ade80')}
+    </div>`).join('') || '<p class="text-slate-500 text-xs">No UTM data yet</p>';
+
+  // Recent sessions
+  document.getElementById('session-rows').innerHTML = d.recent.map(s => `
+    <tr class="text-slate-400 hover:bg-slate-800/40">
+      <td class="py-2 pr-4 text-xs text-slate-500">${fmt(s.ts)}</td>
+      <td class="py-2 pr-4 font-mono text-xs">${s.sid}…</td>
+      <td class="py-2 pr-4"><span class="dot ${s.isNew ? 'dot-new' : 'dot-ret'}"></span>${s.isNew ? 'New' : 'Return'}</td>
+      <td class="py-2 pr-4">${s.device || '—'}</td>
+      <td class="py-2 pr-4">${s.country || '—'}</td>
+      <td class="py-2 pr-4 max-w-xs truncate text-xs">${s.referrer || 'Direct'}</td>
+      <td class="py-2 pr-4 text-xs">${s.utmSrc || '—'}</td>
+      <td class="py-2 pr-4">${s.duration ? s.duration + 's' : '—'}</td>
+      <td class="py-2">${s.scroll ? s.scroll + '%' : '—'}</td>
+    </tr>`).join('') || '<tr><td colspan="9" class="py-4 text-slate-500 text-center text-xs">No sessions yet</td></tr>';
+}
+
+load();
+setInterval(load, 60000); // auto-refresh every minute
+</script>
+</body>
+</html>
