@@ -8,7 +8,7 @@
  */
 (() => {
   const TEST = {
-    'ai-operator-kit':      'https://buy.stripe.com/test_fZucN48gV26adLccXseME0a',
+    'ai-operator-kit':      'https://book.stripe.com/test_7sY3cubt77qu5eGf5AeME0c',
     'fractional-architect': 'https://buy.stripe.com/test_3cIfZgap326agXoe1weME0b',
   };
 
