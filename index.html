@@ -4,231 +4,765 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AI Operator — Customers</title>
-  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { background: #0f172a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-    .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px; }
-    .stat-num { font-size: 2.25rem; font-weight: 800; line-height: 1; }
-    #loader { position: fixed; inset: 0; background: #0f172a; display: flex; align-items: center; justify-content: center; z-index: 50; font-size: 1.25rem; color: #64748b; }
-    .tag { display: inline-block; background: #1e3a5f; color: #7dd3fc; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 6px; margin: 1px; }
-    tr:hover td { background: rgba(255,255,255,0.03); }
-    th { cursor: pointer; user-select: none; }
-    th:hover { color: #e2e8f0; }
-    .sort-asc::after  { content: ' ↑'; color: #ec4899; }
-    .sort-desc::after { content: ' ↓'; color: #ec4899; }
-    input[type=text] { background: #1e293b; border: 1px solid #334155; color: #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 14px; outline: none; }
-    input[type=text]:focus { border-color: #ec4899; }
-    .btn { display: inline-flex; align-items: center; gap: 6px; background: #1e293b; border: 1px solid #334155; color: #94a3b8; border-radius: 8px; padding: 7px 14px; font-size: 13px; cursor: pointer; transition: all .15s; }
-    .btn:hover { border-color: #ec4899; color: #ec4899; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0f172a;
+      --surface: #1e293b;
+      --border:  #334155;
+      --text:    #e2e8f0;
+      --muted:   #94a3b8;
+      --dim:     #64748b;
+      --accent:  #ec4899;
+      --accent2: #a855f7;
+      --green:   #4ade80;
+      --red:     #f87171;
+      --blue:    #7dd3fc;
+      --radius:  10px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+    }
+
+    /* ── Layout ── */
+    #loader {
+      position: fixed; inset: 0;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 12px; z-index: 100;
+    }
+    #loader-spinner {
+      width: 32px; height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loader-text { color: var(--dim); font-size: 15px; }
+
+    #app { display: none; max-width: 1280px; margin: 0 auto; padding: 32px 24px 64px; }
+
+    /* ── Cards & containers ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+      margin-bottom: 28px;
+    }
+    .header-left { display: flex; align-items: center; gap: 10px; }
+    .logo {
+      width: 34px; height: 34px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ec4899, #a855f7);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    h1 { font-size: 18px; font-weight: 700; }
+    .header-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    #last-updated { font-size: 11px; color: var(--dim); }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--muted); border-radius: 8px;
+      padding: 7px 14px; font-size: 13px;
+      cursor: pointer; transition: border-color .15s, color .15s;
+      font-family: inherit;
+    }
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-primary {
+      background: linear-gradient(135deg, #ec4899, #a855f7);
+      border-color: transparent; color: white;
+    }
+    .btn-primary:hover { opacity: .9; border-color: transparent; color: white; }
+    .btn-danger { border-color: var(--red); color: var(--red); }
+    .btn-danger:hover { background: rgba(248,113,113,.1); }
+    .btn-sm { padding: 4px 10px; font-size: 12px; }
+    .btn-icon { padding: 6px; }
+
+    /* ── Summary cards ── */
+    #summary-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card { padding: 18px 20px; }
+    .stat-num { font-size: 2rem; font-weight: 800; line-height: 1; color: white; }
+    .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .stat-sub { font-size: 11px; color: var(--dim); margin-top: 2px; }
+
+    /* ── Toolbar ── */
+    .toolbar {
+      display: flex; align-items: center; gap: 10px;
+      flex-wrap: wrap; margin-bottom: 16px;
+    }
+    .search-wrap { position: relative; flex: 1; min-width: 220px; }
+    .search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--dim); }
+    #search {
+      width: 100%;
+      background: var(--bg); border: 1px solid var(--border);
+      color: var(--text); border-radius: 8px;
+      padding: 8px 12px 8px 34px;
+      font-size: 13px; outline: none; font-family: inherit;
+      transition: border-color .15s;
+    }
+    #search:focus { border-color: var(--accent); }
+    #row-count { font-size: 12px; color: var(--dim); white-space: nowrap; }
+
+    /* ── Table ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead tr { border-bottom: 1px solid var(--border); }
+    th {
+      text-align: left; padding: 0 16px 10px 0;
+      font-size: 11px; font-weight: 600; color: var(--dim);
+      text-transform: uppercase; letter-spacing: .04em;
+      cursor: pointer; user-select: none; white-space: nowrap;
+    }
+    th:hover { color: var(--text); }
+    th.sort-asc::after  { content: ' ↑'; color: var(--accent); }
+    th.sort-desc::after { content: ' ↓'; color: var(--accent); }
+    th:last-child { text-align: right; }
+    tbody tr { border-bottom: 1px solid rgba(51,65,85,.5); transition: background .1s; }
+    tbody tr:hover { background: rgba(255,255,255,.03); }
+    td { padding: 12px 16px 12px 0; vertical-align: middle; }
+    td:last-child { text-align: right; }
+    .td-name { font-weight: 600; color: var(--text); }
+    .td-email { font-family: monospace; font-size: 12px; color: #7dd3fc; }
+    .td-muted { color: var(--muted); }
+    .td-dim { color: var(--dim); font-size: 12px; }
+
+    /* ── Tags ── */
+    .tag {
+      display: inline-block;
+      background: rgba(125, 211, 252, .12);
+      color: var(--blue);
+      font-size: 10px; font-weight: 600;
+      padding: 2px 7px; border-radius: 6px;
+      margin: 1px; white-space: nowrap;
+    }
+    .tag-empty { color: var(--dim); font-style: italic; }
+
+    /* ── Modal ── */
+    .modal-backdrop {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.65);
+      z-index: 200;
+      align-items: center; justify-content: center;
+      padding: 16px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      width: 100%; max-width: 520px;
+      max-height: 90vh; overflow-y: auto;
+    }
+    .modal-title {
+      font-size: 17px; font-weight: 700;
+      margin-bottom: 20px;
+    }
+    .form-grid { display: flex; flex-direction: column; gap: 14px; }
+    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+    input[type=text], input[type=email], textarea, select {
+      width: 100%;
+      background: var(--bg); border: 1px solid var(--border);
+      color: var(--text); border-radius: 8px;
+      padding: 9px 12px; font-size: 13px;
+      outline: none; font-family: inherit;
+      transition: border-color .15s;
+    }
+    input[type=text]:focus, input[type=email]:focus,
+    textarea:focus, select:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 80px; }
+    .modal-footer {
+      display: flex; justify-content: flex-end;
+      gap: 8px; margin-top: 24px;
+    }
+    .form-error { font-size: 12px; color: var(--red); margin-top: 4px; }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 18px;
+      font-size: 13px; color: var(--text);
+      display: none; z-index: 300;
+      box-shadow: 0 8px 32px rgba(0,0,0,.4);
+      max-width: 320px;
+    }
+    #toast.success { border-color: var(--green); color: var(--green); }
+    #toast.error   { border-color: var(--red);   color: var(--red);   }
+
+    /* ── Empty state ── */
+    .empty {
+      padding: 48px 0; text-align: center; color: var(--dim);
+    }
+    .empty-icon { font-size: 36px; margin-bottom: 8px; }
+    .empty-title { font-size: 15px; font-weight: 600; color: var(--muted); }
+    .empty-sub { font-size: 13px; margin-top: 4px; }
+
+    /* ── Detail sidebar ── */
+    .detail-panel {
+      display: none;
+      position: fixed; top: 0; right: 0; bottom: 0;
+      width: 360px; background: var(--surface);
+      border-left: 1px solid var(--border);
+      z-index: 150; overflow-y: auto;
+      padding: 24px;
+    }
+    .detail-panel.open { display: block; }
+    .detail-header {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 20px;
+    }
+    .detail-name { font-size: 16px; font-weight: 700; }
+    .detail-section { margin-top: 20px; }
+    .detail-section-title {
+      font-size: 11px; font-weight: 600; color: var(--dim);
+      text-transform: uppercase; letter-spacing: .05em;
+      margin-bottom: 10px;
+    }
+    .detail-row {
+      display: flex; flex-direction: column;
+      gap: 3px; margin-bottom: 12px;
+    }
+    .detail-key { font-size: 11px; color: var(--dim); }
+    .detail-val { font-size: 13px; color: var(--text); word-break: break-all; }
+    .detail-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
   </style>
 </head>
 <body>
 
-<div id="loader">Loading customers…</div>
+<!-- Loader -->
+<div id="loader">
+  <div id="loader-spinner"></div>
+  <div id="loader-text">Loading customers…</div>
+</div>
 
-<div id="app" class="hidden max-w-7xl mx-auto px-6 py-10 space-y-8">
+<!-- Main app -->
+<div id="app">
 
   <!-- Header -->
-  <div class="flex items-center justify-between flex-wrap gap-4">
-    <div class="flex items-center gap-3">
-      <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,#ec4899,#a855f7)">
-        <svg width="16" height="16" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg>
+  <div class="header">
+    <div class="header-left">
+      <div class="logo">
+        <svg width="16" height="16" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24">
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          <path d="M21 21v-2a4 4 0 0 0-3-3.87"/>
+        </svg>
       </div>
-      <h1 class="text-xl font-bold text-white">AI Operator — Customers</h1>
+      <h1>AI Operator — Customers</h1>
     </div>
-    <div class="flex items-center gap-3">
-      <span id="last-updated" class="text-xs text-slate-500"></span>
-      <button class="btn" onclick="exportCSV()">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <div class="header-right">
+      <span id="last-updated"></span>
+      <button class="btn btn-sm" onclick="load()">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Refresh
+      </button>
+      <button class="btn btn-sm" onclick="exportCSV()">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Export CSV
+      </button>
+      <button class="btn btn-sm btn-primary" onclick="openAddModal()">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Customer
       </button>
     </div>
   </div>
 
   <!-- Summary cards -->
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="summary-cards"></div>
+  <div id="summary-cards"></div>
 
-  <!-- Search + table -->
-  <div class="card space-y-4">
-    <div class="flex items-center gap-3 flex-wrap">
-      <input type="text" id="search" placeholder="Search by name, email, or business…" oninput="filterTable()" class="flex-1 min-w-48" />
-      <span id="row-count" class="text-xs text-slate-500 whitespace-nowrap"></span>
+  <!-- Table card -->
+  <div class="card">
+    <div class="toolbar">
+      <div class="search-wrap">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="search" placeholder="Search by name, email, or business…" oninput="renderTable()" />
+      </div>
+      <span id="row-count"></span>
     </div>
-
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm">
+    <div class="table-wrap">
+      <table>
         <thead>
-          <tr class="text-xs text-slate-500 border-b border-slate-700">
-            <th class="text-left pb-3 pr-4 font-semibold" onclick="sortBy('name')" id="th-name">Name</th>
-            <th class="text-left pb-3 pr-4 font-semibold" onclick="sortBy('email')" id="th-email">Email</th>
-            <th class="text-left pb-3 pr-4 font-semibold" onclick="sortBy('businessName')" id="th-businessName">Business</th>
-            <th class="text-left pb-3 pr-4 font-semibold">Products</th>
-            <th class="text-right pb-3 pr-4 font-semibold" onclick="sortBy('purchaseCount')" id="th-purchaseCount"># Purchases</th>
-            <th class="text-left pb-3 pr-4 font-semibold" onclick="sortBy('firstPurchaseAt')" id="th-firstPurchaseAt">First Purchase</th>
-            <th class="text-left pb-3 font-semibold" onclick="sortBy('lastPurchaseAt')" id="th-lastPurchaseAt">Last Purchase</th>
+          <tr>
+            <th id="th-name"            onclick="sortBy('name')">Name</th>
+            <th id="th-email"           onclick="sortBy('email')">Email</th>
+            <th id="th-businessName"    onclick="sortBy('businessName')">Business</th>
+            <th>Products</th>
+            <th id="th-purchaseCount"   onclick="sortBy('purchaseCount')">Purchases</th>
+            <th id="th-firstPurchaseAt" onclick="sortBy('firstPurchaseAt')">First</th>
+            <th id="th-lastPurchaseAt"  onclick="sortBy('lastPurchaseAt')">Last</th>
+            <th>Actions</th>
           </tr>
         </thead>
-        <tbody id="customer-rows" class="divide-y divide-slate-800/60"></tbody>
+        <tbody id="customer-rows"></tbody>
       </table>
     </div>
   </div>
-
 </div>
+
+<!-- Add / Edit Modal -->
+<div class="modal-backdrop" id="modal-backdrop" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title" id="modal-title">Add Customer</div>
+    <div class="form-grid">
+      <div>
+        <label>Email *</label>
+        <input type="email" id="f-email" placeholder="customer@example.com" />
+        <div class="form-error" id="err-email"></div>
+      </div>
+      <div>
+        <label>Full Name</label>
+        <input type="text" id="f-name" placeholder="Jane Smith" />
+      </div>
+      <div>
+        <label>Business Name</label>
+        <input type="text" id="f-business" placeholder="Acme Corp" />
+      </div>
+      <div>
+        <label>Notes</label>
+        <textarea id="f-notes" placeholder="Internal notes about this customer…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="modal-save-btn" onclick="saveCustomer()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Detail Panel -->
+<div class="detail-panel" id="detail-panel">
+  <div class="detail-header">
+    <div class="detail-name" id="dp-name">—</div>
+    <button class="btn btn-icon" onclick="closeDetail()" title="Close">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <div class="detail-section">
+    <div class="detail-section-title">Contact</div>
+    <div class="detail-row"><div class="detail-key">Email</div><div class="detail-val" id="dp-email">—</div></div>
+    <div class="detail-row"><div class="detail-key">Business</div><div class="detail-val" id="dp-business">—</div></div>
+    <div class="detail-row"><div class="detail-key">Stripe ID</div><div class="detail-val" id="dp-stripe">—</div></div>
+  </div>
+
+  <div class="detail-section">
+    <div class="detail-section-title">Purchases</div>
+    <div class="detail-row"><div class="detail-key">Total Purchases</div><div class="detail-val" id="dp-count">—</div></div>
+    <div class="detail-row"><div class="detail-key">Products</div><div class="detail-val" id="dp-products">—</div></div>
+    <div class="detail-row"><div class="detail-key">First Purchase</div><div class="detail-val" id="dp-first">—</div></div>
+    <div class="detail-row"><div class="detail-key">Last Purchase</div><div class="detail-val" id="dp-last">—</div></div>
+  </div>
+
+  <div class="detail-section">
+    <div class="detail-section-title">Notes</div>
+    <div class="detail-val" id="dp-notes" style="color:var(--muted); white-space:pre-wrap; font-size:13px;">—</div>
+  </div>
+
+  <div class="detail-actions">
+    <button class="btn btn-sm" id="dp-edit-btn" onclick="editCurrentDetail()">
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Edit
+    </button>
+    <button class="btn btn-sm btn-danger" id="dp-delete-btn" onclick="deleteCurrentDetail()">
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+      Delete
+    </button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
 
 <script>
 const API = 'https://z01mzuzo05.execute-api.us-east-1.amazonaws.com/prod/api/customers';
 const KEY = '2c9a66158ebeb785fea45ccc47af61d1fa6f02be9f380a4d';
 
 let allCustomers = [];
-let sortField = 'lastPurchaseAt';
-let sortDir = 'desc';
+let sortField    = 'lastPurchaseAt';
+let sortDir      = 'desc';
+let editEmail    = null; // null = add mode, string = edit mode
+let detailEmail  = null;
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+
+function $(id) { return document.getElementById(id); }
 
 function fmt(iso) {
   if (!iso) return '—';
-  const d = new Date(iso);
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  try {
+    return new Date(iso).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+  } catch { return iso; }
 }
 
 function fmtProduct(p) {
-  // Strip file extensions and format nicely
-  return p.replace(/\.zip$|\.pdf$/, '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  return (p || '').replace(/\.zip$|\.pdf$/i,'').replace(/-/g,' ')
+    .replace(/\b\w/g, c => c.toUpperCase());
 }
 
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+let toastTimer;
+function toast(msg, type = 'success') {
+  const el = $('toast');
+  el.textContent = msg;
+  el.className   = type;
+  el.style.display = 'block';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.style.display = 'none'; }, 3500);
+}
+
+// ── Load ──────────────────────────────────────────────────────────────────────
+
 async function load() {
+  $('loader-text').textContent = 'Loading customers…';
+  $('loader').style.display = 'flex';
+  $('app').style.display    = 'none';
+
   try {
-    const res = await fetch(API, { headers: { 'x-metrics-key': KEY } });
-    if (!res.ok) {
-      document.getElementById('loader').textContent = res.status === 401 ? 'Access denied.' : 'Failed to load.';
+    const res = await fetch(API, {
+      headers: { 'x-metrics-key': KEY },
+    });
+
+    if (res.status === 401) {
+      $('loader-text').textContent = 'Access denied — check API key.';
       return;
     }
+    if (!res.ok) {
+      $('loader-text').textContent = `API error: ${res.status}`;
+      return;
+    }
+
     const data = await res.json();
-    allCustomers = data.customers || [];
-    renderSummary(data.summary);
+    allCustomers = Array.isArray(data.customers) ? data.customers : [];
+
+    renderSummary(data.summary || {});
     renderTable();
-    document.getElementById('loader').classList.add('hidden');
-    document.getElementById('app').classList.remove('hidden');
-    document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+
+    $('loader').style.display = 'none';
+    $('app').style.display    = 'block';
+    $('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+
   } catch (e) {
-    document.getElementById('loader').textContent = 'Failed to connect.';
+    $('loader-text').textContent = 'Failed to connect: ' + e.message;
+    console.error('[customers] load failed', e);
   }
 }
 
+// ── Summary ───────────────────────────────────────────────────────────────────
+
 function renderSummary(s) {
-  const topProduct = s.topProducts?.[0];
+  const topProduct = (s.topProducts || [])[0];
   const cards = [
-    { label: 'Total Customers', value: s.totalCustomers, sub: 'unique buyers' },
-    { label: 'Total Purchases', value: s.totalPurchases, sub: 'across all customers' },
-    { label: 'Top Product', value: topProduct ? topProduct.count : '—', sub: topProduct ? fmtProduct(topProduct.name) : 'none yet' },
-    { label: 'Avg Purchases', value: s.totalCustomers ? (s.totalPurchases / s.totalCustomers).toFixed(1) : '0', sub: 'per customer' },
+    { label: 'Total Customers', value: s.totalCustomers ?? 0,  sub: 'unique buyers' },
+    { label: 'Total Purchases', value: s.totalPurchases ?? 0,  sub: 'across all customers' },
+    { label: 'Top Product',     value: topProduct ? topProduct.count : '—',
+                                sub: topProduct ? fmtProduct(topProduct.name) : 'none yet' },
+    { label: 'Avg Purchases',   value: s.totalCustomers
+        ? (s.totalPurchases / s.totalCustomers).toFixed(1) : '0',
+      sub: 'per customer' },
   ];
-  document.getElementById('summary-cards').innerHTML = cards.map(c => `
-    <div class="card">
-      <div class="stat-num text-white">${c.value}</div>
-      <div class="text-xs text-slate-400 mt-1">${c.label}</div>
-      <div class="text-xs text-slate-500 mt-1">${c.sub}</div>
-    </div>
-  `).join('');
+  $('summary-cards').innerHTML = cards.map(c => `
+    <div class="card stat-card">
+      <div class="stat-num">${esc(String(c.value))}</div>
+      <div class="stat-label">${esc(c.label)}</div>
+      <div class="stat-sub">${esc(c.sub)}</div>
+    </div>`).join('');
 }
 
-function filterTable() {
-  renderTable();
-}
+// ── Table ─────────────────────────────────────────────────────────────────────
 
 function sortBy(field) {
   if (sortField === field) {
     sortDir = sortDir === 'asc' ? 'desc' : 'asc';
   } else {
     sortField = field;
-    sortDir = field === 'purchaseCount' ? 'desc' : 'asc';
+    sortDir   = field === 'purchaseCount' ? 'desc' : 'asc';
   }
   renderTable();
 }
 
 function renderTable() {
-  const search = document.getElementById('search').value.toLowerCase().trim();
-  let rows = allCustomers.filter(c => {
-    if (!search) return true;
-    return (c.email || '').toLowerCase().includes(search) ||
-           (c.name || '').toLowerCase().includes(search) ||
-           (c.businessName || '').toLowerCase().includes(search);
-  });
+  const q    = ($('search').value || '').toLowerCase().trim();
+  let rows   = allCustomers.filter(c =>
+    !q ||
+    (c.email||'').toLowerCase().includes(q) ||
+    (c.name||'').toLowerCase().includes(q) ||
+    (c.businessName||'').toLowerCase().includes(q) ||
+    (c.notes||'').toLowerCase().includes(q)
+  );
 
-  // Sort
   rows.sort((a, b) => {
     let va = a[sortField] ?? '';
     let vb = b[sortField] ?? '';
     if (sortField === 'purchaseCount') {
-      va = Number(va); vb = Number(vb);
-      return sortDir === 'asc' ? va - vb : vb - va;
+      return sortDir === 'asc' ? Number(va) - Number(vb) : Number(vb) - Number(va);
     }
-    return sortDir === 'asc' ? String(va).localeCompare(String(vb)) : String(vb).localeCompare(String(va));
+    return sortDir === 'asc'
+      ? String(va).localeCompare(String(vb))
+      : String(vb).localeCompare(String(va));
   });
 
-  // Update sort indicators
+  // Update sort headers
   ['name','email','businessName','purchaseCount','firstPurchaseAt','lastPurchaseAt'].forEach(f => {
-    const th = document.getElementById('th-' + f);
+    const th = $('th-' + f);
     if (!th) return;
-    th.className = th.className.replace(/\s*sort-(asc|desc)/g, '');
-    if (f === sortField) th.classList.add('sort-' + sortDir);
+    th.className = f === sortField ? 'sort-' + sortDir : '';
   });
 
-  document.getElementById('row-count').textContent = `${rows.length} customer${rows.length !== 1 ? 's' : ''}`;
+  $('row-count').textContent = `${rows.length} customer${rows.length !== 1 ? 's' : ''}`;
 
-  document.getElementById('customer-rows').innerHTML = rows.length === 0
-    ? `<tr><td colspan="7" class="py-8 text-center text-slate-500 text-sm">No customers yet${search ? ' matching your search' : ''}.</td></tr>`
-    : rows.map(c => {
-        const products = Array.isArray(c.products)
-          ? c.products.map(p => `<span class="tag">${fmtProduct(p)}</span>`).join('')
-          : (c.products ? `<span class="tag">${fmtProduct(String(c.products))}</span>` : '—');
-        return `
-          <tr class="text-slate-400 transition-colors">
-            <td class="py-3 pr-4 font-medium text-slate-200">${c.name || '—'}</td>
-            <td class="py-3 pr-4 text-xs font-mono text-slate-300">${c.email}</td>
-            <td class="py-3 pr-4 text-slate-400">${c.businessName || '<span class="text-slate-600 italic">—</span>'}</td>
-            <td class="py-3 pr-4">${products}</td>
-            <td class="py-3 pr-4 text-right font-semibold text-white">${c.purchaseCount || 0}</td>
-            <td class="py-3 pr-4 text-xs text-slate-500">${fmt(c.firstPurchaseAt)}</td>
-            <td class="py-3 text-xs text-slate-500">${fmt(c.lastPurchaseAt)}</td>
-          </tr>
-        `;
-      }).join('');
+  if (rows.length === 0) {
+    $('customer-rows').innerHTML = `
+      <tr><td colspan="8">
+        <div class="empty">
+          <div class="empty-icon">👥</div>
+          <div class="empty-title">No customers yet${q ? ' matching your search' : ''}</div>
+          <div class="empty-sub">${q ? 'Try a different search term.' : 'Customers will appear here after a Stripe checkout.'}</div>
+        </div>
+      </td></tr>`;
+    return;
+  }
+
+  $('customer-rows').innerHTML = rows.map(c => {
+    const products = Array.isArray(c.products) && c.products.length
+      ? c.products.map(p => `<span class="tag">${esc(fmtProduct(p))}</span>`).join('')
+      : `<span class="tag-empty">—</span>`;
+    return `
+      <tr style="cursor:pointer" onclick="openDetail('${esc(c.email)}')">
+        <td class="td-name">${esc(c.name || '—')}</td>
+        <td class="td-email">${esc(c.email)}</td>
+        <td class="td-muted">${esc(c.businessName || '—')}</td>
+        <td>${products}</td>
+        <td style="text-align:right; font-weight:700; color:white">${c.purchaseCount || 0}</td>
+        <td class="td-dim">${fmt(c.firstPurchaseAt)}</td>
+        <td class="td-dim">${fmt(c.lastPurchaseAt)}</td>
+        <td onclick="event.stopPropagation()">
+          <button class="btn btn-sm" onclick="openEditModal('${esc(c.email)}')" title="Edit">✏️</button>
+          <button class="btn btn-sm" onclick="confirmDelete('${esc(c.email)}')" title="Delete" style="margin-left:4px">🗑️</button>
+        </td>
+      </tr>`;
+  }).join('');
 }
+
+// ── Add / Edit Modal ──────────────────────────────────────────────────────────
+
+function openAddModal() {
+  editEmail = null;
+  $('modal-title').textContent  = 'Add Customer';
+  $('modal-save-btn').textContent = 'Add Customer';
+  $('f-email').value    = '';
+  $('f-email').disabled = false;
+  $('f-name').value     = '';
+  $('f-business').value = '';
+  $('f-notes').value    = '';
+  $('err-email').textContent = '';
+  $('modal-backdrop').classList.add('open');
+  setTimeout(() => $('f-email').focus(), 50);
+}
+
+function openEditModal(email) {
+  const c = allCustomers.find(x => x.email === email);
+  if (!c) return;
+  editEmail = email;
+  $('modal-title').textContent  = 'Edit Customer';
+  $('modal-save-btn').textContent = 'Save Changes';
+  $('f-email').value    = c.email;
+  $('f-email').disabled = true;
+  $('f-name').value     = c.name        || '';
+  $('f-business').value = c.businessName|| '';
+  $('f-notes').value    = c.notes       || '';
+  $('err-email').textContent = '';
+  $('modal-backdrop').classList.add('open');
+  setTimeout(() => $('f-name').focus(), 50);
+}
+
+function closeModal(e) {
+  if (e && e.target !== $('modal-backdrop')) return;
+  $('modal-backdrop').classList.remove('open');
+}
+
+async function saveCustomer() {
+  const email    = $('f-email').value.trim().toLowerCase();
+  const name     = $('f-name').value.trim();
+  const business = $('f-business').value.trim();
+  const notes    = $('f-notes').value.trim();
+
+  $('err-email').textContent = '';
+
+  if (!email) {
+    $('err-email').textContent = 'Email is required.';
+    $('f-email').focus();
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    $('err-email').textContent = 'Enter a valid email address.';
+    $('f-email').focus();
+    return;
+  }
+
+  const btn = $('modal-save-btn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  try {
+    const res = await fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-metrics-key': KEY },
+      body: JSON.stringify({ email, name, businessName: business, notes }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Save failed');
+
+    $('modal-backdrop').classList.remove('open');
+    toast(editEmail ? 'Customer updated.' : 'Customer added.');
+    await load();
+
+    if (editEmail && $('detail-panel').classList.contains('open')) {
+      openDetail(email);
+    }
+  } catch (e) {
+    toast('Error: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = editEmail ? 'Save Changes' : 'Add Customer';
+  }
+}
+
+// ── Delete ────────────────────────────────────────────────────────────────────
+
+async function confirmDelete(email) {
+  const c = allCustomers.find(x => x.email === email);
+  const label = c?.name ? `${c.name} (${email})` : email;
+  if (!confirm(`Delete customer ${label}?\n\nThis cannot be undone.`)) return;
+  await deleteCustomer(email);
+}
+
+async function deleteCustomer(email) {
+  try {
+    const res = await fetch(`${API}?email=${encodeURIComponent(email)}`, {
+      method: 'DELETE',
+      headers: { 'x-metrics-key': KEY },
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Delete failed');
+    toast('Customer deleted.');
+    closeDetail();
+    await load();
+  } catch (e) {
+    toast('Error: ' + e.message, 'error');
+  }
+}
+
+// ── Detail Panel ──────────────────────────────────────────────────────────────
+
+function openDetail(email) {
+  const c = allCustomers.find(x => x.email === email);
+  if (!c) return;
+  detailEmail = email;
+
+  $('dp-name').textContent     = c.name || c.email;
+  $('dp-email').textContent    = c.email;
+  $('dp-business').textContent = c.businessName || '—';
+  $('dp-stripe').textContent   = c.stripeCustomerId || '—';
+  $('dp-count').textContent    = c.purchaseCount || 0;
+  $('dp-first').textContent    = fmt(c.firstPurchaseAt);
+  $('dp-last').textContent     = fmt(c.lastPurchaseAt);
+  $('dp-notes').textContent    = c.notes || '—';
+
+  const prods = Array.isArray(c.products) && c.products.length
+    ? c.products.map(p => fmtProduct(p)).join(', ')
+    : '—';
+  $('dp-products').textContent = prods;
+
+  $('detail-panel').classList.add('open');
+}
+
+function closeDetail() {
+  $('detail-panel').classList.remove('open');
+  detailEmail = null;
+}
+
+function editCurrentDetail() {
+  if (detailEmail) openEditModal(detailEmail);
+}
+
+function deleteCurrentDetail() {
+  if (detailEmail) confirmDelete(detailEmail);
+}
+
+// ── CSV Export ────────────────────────────────────────────────────────────────
 
 function exportCSV() {
-  const search = document.getElementById('search').value.toLowerCase().trim();
-  let rows = allCustomers.filter(c => {
-    if (!search) return true;
-    return (c.email || '').toLowerCase().includes(search) ||
-           (c.name || '').toLowerCase().includes(search) ||
-           (c.businessName || '').toLowerCase().includes(search);
-  });
+  const q    = ($('search').value || '').toLowerCase().trim();
+  const rows = allCustomers.filter(c =>
+    !q ||
+    (c.email||'').toLowerCase().includes(q) ||
+    (c.name||'').toLowerCase().includes(q) ||
+    (c.businessName||'').toLowerCase().includes(q)
+  );
 
-  const headers = ['Name', 'Email', 'Business', 'Products', 'Purchase Count', 'First Purchase', 'Last Purchase'];
-  const csvRows = [headers.join(',')];
-  rows.forEach(c => {
-    const products = Array.isArray(c.products) ? c.products.join('; ') : (c.products || '');
-    csvRows.push([
-      `"${(c.name || '').replace(/"/g, '""')}"`,
-      `"${(c.email || '').replace(/"/g, '""')}"`,
-      `"${(c.businessName || '').replace(/"/g, '""')}"`,
-      `"${products.replace(/"/g, '""')}"`,
-      c.purchaseCount || 0,
-      fmt(c.firstPurchaseAt),
-      fmt(c.lastPurchaseAt),
-    ].join(','));
-  });
+  const headers = ['Name','Email','Business','Notes','Products','Purchase Count','First Purchase','Last Purchase','Stripe ID'];
+  const csv = [
+    headers.join(','),
+    ...rows.map(c => {
+      const products = Array.isArray(c.products) ? c.products.join('; ') : '';
+      const col = v => `"${String(v||'').replace(/"/g,'""')}"`;
+      return [
+        col(c.name), col(c.email), col(c.businessName), col(c.notes),
+        col(products), c.purchaseCount || 0,
+        fmt(c.firstPurchaseAt), fmt(c.lastPurchaseAt), col(c.stripeCustomerId),
+      ].join(',');
+    }),
+  ].join('\n');
 
-  const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
   a.download = `ai-operator-customers-${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
-  URL.revokeObjectURL(url);
+  URL.revokeObjectURL(a.href);
 }
 
+// ── Keyboard shortcuts ────────────────────────────────────────────────────────
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if ($('modal-backdrop').classList.contains('open')) closeModal();
+    else closeDetail();
+  }
+});
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
 load();
-setInterval(load, 120000); // auto-refresh every 2 minutes
+setInterval(load, 120000);
 </script>
 </body>
 </html>
