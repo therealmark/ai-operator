@@ -1,74 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Payment received • AI Operator kit</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>You're in — AI Operator</title>
+  <link rel="icon" type="image/png" href="/images/logo.png" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/site.css" />
+  <style>
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.6s ease both; }
+    .fade-up-1 { animation-delay: 0.1s; }
+    .fade-up-2 { animation-delay: 0.25s; }
+    .fade-up-3 { animation-delay: 0.4s; }
+    .fade-up-4 { animation-delay: 0.55s; }
+    .check-ring {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #fb7185, #a855f7);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 0 12px rgba(251,113,133,0.12);
+    }
+  </style>
 </head>
-<body class="bg-zinc-950 text-zinc-50 min-h-screen">
-  <main class="max-w-3xl mx-auto px-6 py-16 flex flex-col gap-6">
-    <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-10 text-center">
-      <h1 class="text-3xl font-bold">Thank you!</h1>
-      <p class="text-zinc-300 mt-3">Your donation is confirmed. We’re preparing your download.</p>
-      <div id="status" class="text-sm text-zinc-500 mt-6">Checking session…</div>
-      <button id="retry" class="hidden bg-emerald-500 hover:bg-emerald-400 text-black font-semibold px-4 py-2 rounded-xl mt-4">Retry download</button>
+<body class="min-h-screen bg-white overflow-x-hidden">
+
+  <!-- Navbar -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-rose-100/60">
+    <div class="max-w-5xl mx-auto px-6 h-16 flex items-center">
+      <a href="/" aria-label="AI Operator home">
+        <img src="/images/logo.png" alt="AI Operator" class="h-11 w-auto" />
+      </a>
     </div>
+  </nav>
+
+  <!-- Ghost watermark -->
+  <div aria-hidden="true" class="fixed inset-0 overflow-hidden pointer-events-none select-none z-0">
+    <img src="/images/logo.png" alt=""
+      style="position:absolute; right:-6%; top:50%; transform:translateY(-50%); width:min(620px,70vw); opacity:0.07; filter:blur(0.5px); mix-blend-mode:multiply;" />
+  </div>
+
+  <main class="relative z-10 pt-32 pb-24 px-6 max-w-2xl mx-auto flex flex-col items-center text-center gap-10">
+
+    <!-- Check mark -->
+    <div class="check-ring fade-up fade-up-1">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 6L9 17l-5-5"/>
+      </svg>
+    </div>
+
+    <!-- Headline -->
+    <div class="space-y-3 fade-up fade-up-2">
+      <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 leading-tight">
+        You're in.<br/><span class="text-gradient">Let's build.</span>
+      </h1>
+      <p class="text-slate-500 text-lg max-w-md mx-auto leading-relaxed">
+        Your AI Operator Kit is on its way to your inbox. Check your email — the download link will be there within a minute.
+      </p>
+    </div>
+
+    <!-- Divider -->
+    <div class="w-full border-t border-rose-100 fade-up fade-up-3"></div>
+
+    <!-- Book a session -->
+    <div class="w-full bg-white border border-rose-100 rounded-3xl p-8 shadow-sm space-y-5 fade-up fade-up-3">
+      <div>
+        <p class="text-xs uppercase tracking-widest text-pink-500 mb-2">Next step</p>
+        <h2 class="text-2xl font-bold text-slate-800">Book your first session.</h2>
+        <p class="text-slate-500 mt-2 leading-relaxed">
+          Your Architect is ready to start. Pick a time that works for you — in person or remote — and we'll get your engagement underway.
+        </p>
+      </div>
+
+      <a href="https://calendar.app.google/tN2C8hnMdvQDa8Vf7"
+         target="_blank" rel="noopener"
+         class="cta-primary inline-flex" style="width: 100%; justify-content: center;">
+        Book Your First Session
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+
+      <div class="grid grid-cols-3 gap-4 pt-2">
+        <div class="text-center">
+          <p class="text-2xl font-bold text-slate-800">60</p>
+          <p class="text-xs text-slate-400 mt-1">min session</p>
+        </div>
+        <div class="text-center">
+          <p class="text-2xl font-bold text-slate-800">2</p>
+          <p class="text-xs text-slate-400 mt-1">week engagement</p>
+        </div>
+        <div class="text-center">
+          <p class="text-2xl font-bold text-slate-800">1</p>
+          <p class="text-xs text-slate-400 mt-1">business built</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- What to expect -->
+    <div class="w-full text-left space-y-4 fade-up fade-up-4">
+      <h3 class="text-lg font-semibold text-slate-700">What to expect in your first session</h3>
+      <ul class="space-y-3 text-slate-500">
+        <li class="flex gap-3"><span class="text-pink-400 mt-0.5">▸</span> Your Architect will walk through the kit with you</li>
+        <li class="flex gap-3"><span class="text-pink-400 mt-0.5">▸</span> You'll define your business model and target customer</li>
+        <li class="flex gap-3"><span class="text-pink-400 mt-0.5">▸</span> The tech stack and revenue architecture get locked in</li>
+        <li class="flex gap-3"><span class="text-pink-400 mt-0.5">▸</span> You'll leave session one knowing exactly what you're building</li>
+      </ul>
+    </div>
+
+    <!-- Back link -->
+    <a href="/" class="text-sm text-slate-400 hover:text-pink-500 transition-colors fade-up fade-up-4">
+      ← Back to ai-operator.biz
+    </a>
+
   </main>
-
-  <script>
-    const API_BASE = 'https://z01mzuzo05.execute-api.us-east-1.amazonaws.com/prod';
-    const statusEl = document.getElementById('status');
-    const retryBtn = document.getElementById('retry');
-
-    async function fetchSession(sessionId) {
-      try {
-        const res = await fetch(`${API_BASE}/api/session?session_id=${sessionId}`);
-        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-        return await res.json();
-      } catch (err) {
-        throw err;
-      }
-    }
-
-    function triggerDownloads(downloads = []) {
-      downloads.forEach((d, idx) => {
-        setTimeout(() => {
-          const a = document.createElement('a');
-          a.href = d.url;
-          a.download = d.filename || 'ai-operator-kit.zip';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        }, idx * 1000);
-      });
-    }
-
-    async function init() {
-      const params = new URLSearchParams(window.location.search);
-      const sessionId = params.get('session_id');
-      if (!sessionId) {
-        statusEl.textContent = 'Missing session ID. Check your e-mail for the download link or contact support.';
-        retryBtn.classList.remove('hidden');
-        return;
-      }
-      statusEl.textContent = 'Verifying donation…';
-      try {
-        const data = await fetchSession(sessionId);
-        if (data.email) {
-          statusEl.textContent = `We also e-mailed ${data.email} a copy.`;
-        } else {
-          statusEl.textContent = 'Download starting…';
-        }
-        triggerDownloads(data.downloads || []);
-      } catch (err) {
-        statusEl.textContent = `Could not verify payment (${err.message}).`;
-        retryBtn.classList.remove('hidden');
-      }
-    }
-
-    retryBtn.addEventListener('click', init);
-    init();
-  </script>
 </body>
 </html>
