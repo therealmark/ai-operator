@@ -524,75 +524,105 @@
 <!-- ─── ANALYTICS TRACKER ──────────────────────────────────── -->
 <script>
 (function () {
-  const API = 'https://z01mzuzo05.execute-api.us-east-1.amazonaws.com/prod/api/track';
-  const VID_KEY = 'ao_vid';
-  const SID_KEY = 'ao_sid';
+  try {
+    const API = 'https://z01mzuzo05.execute-api.us-east-1.amazonaws.com/prod/api/track';
 
-  function uid() { return Math.random().toString(36).slice(2, 10) + Date.now().toString(36); }
-  function getDevice() {
-    const w = window.innerWidth;
-    return w < 768 ? 'mobile' : w < 1024 ? 'tablet' : 'desktop';
-  }
-  function getUtm(k) { return new URLSearchParams(location.search).get(k) || ''; }
+    function uid() { return Math.random().toString(36).slice(2, 10) + Date.now().toString(36); }
 
-  // Visitor ID (persists across sessions)
-  let vid = localStorage.getItem(VID_KEY);
-  if (!vid) { vid = uid(); localStorage.setItem(VID_KEY, vid); }
-
-  // Session ID (resets per tab/session)
-  let sid = sessionStorage.getItem(SID_KEY);
-  const isNew = !sid;
-  if (!sid) { sid = uid(); sessionStorage.setItem(SID_KEY, sid); }
-
-  const base = {
-    sid, vid, isNew,
-    page:     location.pathname,
-    referrer: document.referrer,
-    utmSrc:   getUtm('utm_source'),
-    utmMed:   getUtm('utm_medium'),
-    utmCamp:  getUtm('utm_campaign'),
-    utmTerm:  getUtm('utm_term'),
-    utmCont:  getUtm('utm_content'),
-    ua:       navigator.userAgent,
-    lang:     navigator.language,
-    screen:   `${screen.width}x${screen.height}`,
-    device:   getDevice(),
-  };
-
-  function send(extra) {
-    const payload = { ...base, ts: new Date().toISOString(), ...extra };
-    fetch(API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      keepalive: true,
-    }).catch(() => {});
-  }
-
-  // Pageview
-  send({ type: 'pageview' });
-
-  // CTA clicks
-  document.addEventListener('click', function (e) {
-    const el = e.target.closest('[data-checkout], .cta-primary, a[href*="calendar"], a[href*="mailto"]');
-    if (!el) return;
-    const label = el.dataset.checkout || el.textContent.trim().slice(0, 40) || el.href;
-    send({ type: 'click', label });
-  });
-
-  // Duration + scroll depth on unload
-  const t0 = Date.now();
-  let maxScroll = 0;
-  window.addEventListener('scroll', function () {
-    const pct = Math.round(((window.scrollY + window.innerHeight) / document.documentElement.scrollHeight) * 100);
-    if (pct > maxScroll) maxScroll = pct;
-  }, { passive: true });
-
-  window.addEventListener('visibilitychange', function () {
-    if (document.visibilityState === 'hidden') {
-      send({ type: 'exit', duration: Math.round((Date.now() - t0) / 1000), scrollDepth: maxScroll });
+    function getDevice() {
+      const ua = navigator.userAgent;
+      if (/iPad|Tablet/i.test(ua)) return 'tablet';
+      if (/iPhone|iPod|Android.*Mobile|Mobile.*Android|BlackBerry|IEMobile|Opera Mini/i.test(ua)) return 'mobile';
+      const w = window.innerWidth;
+      return w < 768 ? 'mobile' : w < 1024 ? 'tablet' : 'desktop';
     }
-  });
+
+    function getUtm(k) {
+      try { return new URLSearchParams(location.search).get(k) || ''; } catch (e) { return ''; }
+    }
+
+    // Safe storage helpers — iOS Safari Private Browsing throws on setItem
+    function storageGet(store, key) {
+      try { return store.getItem(key); } catch (e) { return null; }
+    }
+    function storageSet(store, key, val) {
+      try { store.setItem(key, val); } catch (e) { /* private mode — use in-memory only */ }
+    }
+
+    // Visitor ID (persists, falls back to session-only if storage blocked)
+    let vid = storageGet(localStorage, 'ao_vid');
+    if (!vid) { vid = uid(); storageSet(localStorage, 'ao_vid', vid); }
+
+    // Session ID
+    let sid = storageGet(sessionStorage, 'ao_sid');
+    const isNew = !storageGet(localStorage, 'ao_seen');
+    if (!sid) { sid = uid(); storageSet(sessionStorage, 'ao_sid', sid); }
+    storageSet(localStorage, 'ao_seen', '1');
+
+    const base = {
+      sid, vid, isNew,
+      page:     location.pathname,
+      referrer: document.referrer || '',
+      utmSrc:   getUtm('utm_source'),
+      utmMed:   getUtm('utm_medium'),
+      utmCamp:  getUtm('utm_campaign'),
+      utmTerm:  getUtm('utm_term'),
+      utmCont:  getUtm('utm_content'),
+      ua:       navigator.userAgent,
+      lang:     navigator.language || '',
+      screen:   (screen.width || 0) + 'x' + (screen.height || 0),
+      device:   getDevice(),
+    };
+
+    function send(extra) {
+      try {
+        const payload = JSON.stringify(Object.assign({}, base, { ts: new Date().toISOString() }, extra));
+        // Simple request (no preflight) — works on all browsers including iOS Safari ITP
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon(API, new Blob([payload], { type: 'application/json' }));
+        } else {
+          fetch(API, { method: 'POST', body: payload, keepalive: true }).catch(function(){});
+        }
+      } catch (e) { /* silent */ }
+    }
+
+    // Pageview — fires immediately
+    send({ type: 'pageview' });
+
+    // CTA clicks
+    document.addEventListener('click', function (e) {
+      try {
+        var el = e.target && e.target.closest
+          ? e.target.closest('[data-checkout], .cta-primary, a[href*="calendar"], a[href*="mailto"]')
+          : null;
+        if (!el) return;
+        var label = (el.dataset && el.dataset.checkout) || el.innerText.trim().slice(0, 40) || el.href || '';
+        send({ type: 'click', label: label });
+      } catch (e) { /* silent */ }
+    });
+
+    // Scroll depth
+    var t0 = Date.now(), maxScroll = 0;
+    window.addEventListener('scroll', function () {
+      try {
+        var pct = Math.round(((window.scrollY + window.innerHeight) / document.documentElement.scrollHeight) * 100);
+        if (pct > maxScroll) maxScroll = pct;
+      } catch (e) {}
+    }, { passive: true });
+
+    // Exit — visibilitychange is the most reliable cross-browser/mobile signal
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'hidden') {
+        send({ type: 'exit', duration: Math.round((Date.now() - t0) / 1000), scrollDepth: maxScroll });
+      }
+    });
+
+    // pagehide fires on iOS when navigating away (visibilitychange sometimes doesn't)
+    window.addEventListener('pagehide', function () {
+      send({ type: 'exit', duration: Math.round((Date.now() - t0) / 1000), scrollDepth: maxScroll });
+    });
+
+  } catch (e) { /* tracking unavailable */ }
 })();
 </script>
 
