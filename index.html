@@ -3,522 +3,191 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AI Operator — Build a business that runs itself.</title>
-  <meta name="description" content="A two-week architect-led engagement. Leave with a fully operational AI-powered business generating passive income — and the skills to build the next one." />
-  <link rel="icon" type="image/png" href="/images/logo.png" />
-  <link rel="icon" type="image/svg+xml" href="/images/logo.svg" />
+  <title>AI Operator — Metrics</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="/css/site.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <style>
+    body { background: #0f172a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px; }
+    .stat-num { font-size: 2.25rem; font-weight: 800; line-height: 1; }
+    .badge { display: inline-block; background: #0ea5e9; color: white; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: .05em; }
+    .dot-new { background: #4ade80; }
+    .dot-ret { background: #fb923c; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+    #loader { position: fixed; inset: 0; background: #0f172a; display: flex; align-items: center; justify-content: center; z-index: 50; font-size: 1.25rem; color: #64748b; }
+  </style>
 </head>
-<body class="overflow-x-hidden">
+<body>
 
-  <!-- ─── NAVBAR ───────────────────────────────────────────── -->
-  <nav class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-rose-100/60">
-    <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-      <a href="/" aria-label="AI Operator home">
-        <img src="/images/logo.png" alt="AI Operator" class="h-11 w-auto" />
-      </a>
-      <div class="flex items-center gap-4">
-        <a href="#pricing" class="hidden sm:block text-sm text-slate-500 hover:text-slate-800 transition-colors">Pricing</a>
-        <a href="mailto:support@ai-operator.biz" class="hidden sm:block text-sm text-slate-500 hover:text-slate-800 transition-colors">Contact</a>
-        <button class="cta-primary !py-2.5 !px-5 !text-sm" data-checkout="ai-operator-kit">
-          Engage
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </button>
+<div id="loader">Loading analytics…</div>
+
+<div id="app" class="hidden max-w-7xl mx-auto px-6 py-10 space-y-8">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,#ec4899,#a855f7)">
+        <svg width="16" height="16" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 3v18"/></svg>
       </div>
+      <h1 class="text-xl font-bold text-white">AI Operator Metrics</h1>
     </div>
-  </nav>
+    <div id="last-updated" class="text-xs text-slate-500"></div>
+  </div>
 
-  <!-- ─── HERO ─────────────────────────────────────────────── -->
-  <header class="relative min-h-screen flex flex-col justify-center border-b border-rose-100 overflow-hidden pt-16">
-    <div class="hero-glow" aria-hidden="true"></div>
-    <div class="hero-grid" aria-hidden="true"></div>
+  <!-- Summary cards -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="summary-cards"></div>
 
-    <!-- Ghost watermark logo -->
-    <div aria-hidden="true" class="absolute inset-0 overflow-hidden pointer-events-none select-none">
-      <img src="/images/logo.png" alt=""
-        class="absolute"
-        style="
-          right: -6%;
-          top: 50%;
-          transform: translateY(-50%);
-          width: min(680px, 72vw);
-          opacity: 0.13;
-          filter: blur(0.5px);
-          mix-blend-mode: multiply;
-        "
-      />
+  <!-- Charts row -->
+  <div class="grid md:grid-cols-3 gap-4">
+    <div class="card"><h3 class="text-sm font-semibold text-slate-400 mb-4">Devices</h3><canvas id="deviceChart" height="180"></canvas></div>
+    <div class="card"><h3 class="text-sm font-semibold text-slate-400 mb-4">CTA Clicks</h3><canvas id="clickChart" height="180"></canvas></div>
+    <div class="card"><h3 class="text-sm font-semibold text-slate-400 mb-4">Top Countries</h3><div id="countries-list" class="space-y-2 text-sm"></div></div>
+  </div>
+
+  <!-- Referrers + UTM -->
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="card">
+      <h3 class="text-sm font-semibold text-slate-400 mb-4">Top Referrers</h3>
+      <div id="referrers-list" class="space-y-2 text-sm"></div>
     </div>
-
-    <div class="relative z-10 max-w-5xl mx-auto px-6 py-24 flex flex-col gap-10">
-
-      <!-- Eyebrow -->
-      <div class="flex items-center gap-3">
-        <span class="inline-block w-2 h-2 rounded-full bg-pink-400 animate-pulse"></span>
-        <p class="uppercase tracking-[0.3em] text-sm text-pink-500 font-medium">Architect-led · AI-native · Revenue-focused</p>
-      </div>
-
-      <!-- Headline -->
-      <div class="space-y-4">
-        <h1 class="text-5xl md:text-7xl font-extrabold leading-[1.05] tracking-tight text-slate-800">
-          Build a business<br/>
-          <span class="text-gradient">that generates income</span><br/>
-          <span class="text-slate-400">while you sleep.</span>
-        </h1>
-        <p class="text-xl md:text-2xl text-slate-500 max-w-2xl leading-relaxed">
-          AI Operator offers a two-week intensive engagement with a Principal Architect. Whether you're launching your first venture or adding to your portfolio — you leave with a fully operational AI-powered business generating passive income, and the capability to build the next one faster.
-        </p>
-      </div>
-
-      <!-- iPhone mockup with iMessage animation -->
-      <div class="iphone-outer">
-        <div class="iphone-btn-mute"></div>
-        <div class="iphone-btn-vol-up"></div>
-        <div class="iphone-btn-vol-down"></div>
-        <div class="iphone-btn-power"></div>
-        <div class="iphone-frame">
-          <div class="iphone-dynamic-island"></div>
-          <div class="iphone-screen">
-            <div class="imessage-window">
-              <div class="imessage-header">
-                <div class="imessage-avatar">🤖</div>
-                <div class="imessage-header-info">
-                  <div class="imessage-name">AI Operator</div>
-                  <div class="imessage-online">● Active now</div>
-                </div>
-              </div>
-              <div class="imessage-body" id="chat-body"></div>
-              <div class="imessage-footer">
-                <div class="imessage-inputbar">
-                  <span id="chat-input" class="imessage-input-text"></span><span class="imessage-cursor">|</span>
-                </div>
-                <button class="imessage-send" aria-label="Send">↑</button>
-              </div>
-            </div>
-          </div>
-          <div class="iphone-home-indicator"></div>
-        </div>
-      </div>
-
-      <!-- Stats strip -->
-      <div class="power-strip">
-        <div class="power-stat">
-          <span class="power-number" data-target="2">0</span><span class="power-suffix"> weeks</span>
-          <span class="power-label">Intensive engagement</span>
-        </div>
-        <div class="power-divider"></div>
-        <div class="power-stat">
-          <span class="power-number" data-target="2">0</span><span class="power-suffix"> outcomes</span>
-          <span class="power-label">Delivered. No exceptions.</span>
-        </div>
-        <div class="power-divider"></div>
-        <div class="power-stat">
-          <span class="power-number" data-target="100">0</span><span class="power-suffix">%</span>
-          <span class="power-label">Operational on exit</span>
-        </div>
-      </div>
-
-      <!-- CTAs -->
-      <div class="flex flex-col sm:flex-row gap-4">
-        <button class="cta-primary" data-checkout="ai-operator-kit">
-          Engage
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </button>
-        <a href="#how-it-works" class="cta-secondary">
-          See how it works
-        </a>
-      </div>
-
+    <div class="card">
+      <h3 class="text-sm font-semibold text-slate-400 mb-4">UTM Sources</h3>
+      <div id="utm-list" class="space-y-2 text-sm"></div>
     </div>
-  </header>
+  </div>
 
-  <main class="max-w-5xl mx-auto px-6 py-20 space-y-28">
+  <!-- Recent sessions -->
+  <div class="card">
+    <h3 class="text-sm font-semibold text-slate-400 mb-4">Recent Sessions</h3>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-xs text-slate-500 border-b border-slate-700">
+            <th class="text-left pb-2 pr-4">Time</th>
+            <th class="text-left pb-2 pr-4">Session</th>
+            <th class="text-left pb-2 pr-4">Status</th>
+            <th class="text-left pb-2 pr-4">Device</th>
+            <th class="text-left pb-2 pr-4">Country</th>
+            <th class="text-left pb-2 pr-4">Referrer</th>
+            <th class="text-left pb-2 pr-4">UTM</th>
+            <th class="text-left pb-2 pr-4">Duration</th>
+            <th class="text-left pb-2">Scroll</th>
+          </tr>
+        </thead>
+        <tbody id="session-rows" class="divide-y divide-slate-800"></tbody>
+      </table>
+    </div>
+  </div>
 
-    <!-- ─── TWO DELIVERABLES ──────────────────────────────── -->
-    <section class="space-y-12">
-      <div class="text-center space-y-4 max-w-3xl mx-auto">
-        <p class="uppercase tracking-[0.3em] text-sm text-pink-500">What you leave with</p>
-        <h2 class="text-4xl md:text-5xl font-bold text-slate-800">Two deliverables.<br/>No exceptions.</h2>
-        <p class="text-slate-500 text-lg">This isn't a course. It isn't a workshop. It's a professional services engagement — and by the end of it, you'll have built two real things.</p>
-      </div>
+</div>
 
-      <div class="grid md:grid-cols-2 gap-6">
-        <!-- Deliverable 1: Live Business -->
-        <div class="after-card">
-          <p class="text-pink-500 uppercase tracking-widest text-xs mb-4">🏗️ Deliverable One</p>
-          <h3 class="text-xl font-bold text-slate-800 mb-3">A live, revenue-generating business</h3>
-          <p class="text-slate-600 leading-relaxed mb-4">By the end of the engagement, you'll have deployed a fully operational AI-powered online business. Not a prototype. Not a plan. A real system — with a product, a payment flow, and the infrastructure to generate income while you sleep.</p>
-          <p class="text-slate-400 text-sm italic">Designed for your market. Built to your architecture. Yours to operate, scale, or hand off.</p>
-        </div>
-        <!-- Deliverable 2: AI Agent Capability -->
-        <div class="before-card">
-          <p class="text-violet-500 uppercase tracking-widest text-xs mb-4">⚡ Deliverable Two</p>
-          <h3 class="text-xl font-bold text-slate-800 mb-3">The leverage to build again, faster</h3>
-          <p class="text-slate-600 leading-relaxed mb-4">You'll leave with deep, working knowledge of AI agents — how to design them, wire them into business systems, and deploy them at scale. The next idea you have? You'll be able to move on it in days. Not months. Not years.</p>
-          <p class="text-slate-400 text-sm italic">Serial entrepreneurs don't build once. This is how you build faster every time.</p>
-        </div>
-      </div>
-    </section>
+<script>
+const API = 'https://z01mzuzo05.execute-api.us-east-1.amazonaws.com/prod/api/analytics';
+const KEY = '2c9a66158ebeb785fea45ccc47af61d1fa6f02be9f380a4d';
 
-    <!-- ─── WHO THIS IS FOR ──────────────────────────────────  -->
-    <section class="space-y-12">
-      <div class="text-center space-y-4 max-w-3xl mx-auto">
-        <p class="uppercase tracking-[0.3em] text-sm text-pink-500">Who this is for</p>
-        <h2 class="text-4xl md:text-5xl font-bold text-slate-800">Two kinds of people<br/>end up here.</h2>
-        <p class="text-slate-500 text-lg">Different starting points. Same outcome.</p>
-      </div>
+function fmt(ts) {
+  const d = new Date(ts);
+  return d.toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+}
 
-      <div class="grid md:grid-cols-2 gap-6">
-        <!-- The Serial Entrepreneur -->
-        <div class="after-card">
-          <p class="text-pink-500 uppercase tracking-widest text-xs mb-4">🧠 The Serial Entrepreneur</p>
-          <p class="text-slate-600 leading-relaxed mb-4">You've built before. You know what execution looks like and what it costs. You're here because the toolset just changed — and you want the unfair advantage before everyone else figures out what you already suspect: AI-native businesses can be built in weeks, not years, at a fraction of the overhead.</p>
-          <p class="text-slate-400 text-sm italic">You're not learning how to build. You're upgrading how fast and how lean you can do it.</p>
-        </div>
-        <!-- The Aspiring Operator -->
-        <div class="before-card">
-          <p class="text-violet-500 uppercase tracking-widest text-xs mb-4">🚀 The Aspiring Operator</p>
-          <p class="text-slate-600 leading-relaxed mb-4">You have the ambition. You've had the idea. What's been missing is a clear, structured path from vision to operational, revenue-generating business — with someone who knows the architecture sitting next to you the whole way. This is that path.</p>
-          <p class="text-slate-400 text-sm italic">You don't need a background in tech or business. You need the drive to build something real — and two weeks of serious focus.</p>
-        </div>
-      </div>
-    </section>
+function bar(pct, color = '#ec4899') {
+  return `<div style="background:#1e293b;border-radius:4px;height:6px;width:100%;margin-top:4px"><div style="background:${color};border-radius:4px;height:6px;width:${pct}%"></div></div>`;
+}
 
-    <!-- ─── WHAT YOU'RE BUILDING ──────────────────────────── -->
-    <section class="space-y-10">
-      <div class="space-y-3">
-        <p class="uppercase tracking-[0.3em] text-sm text-pink-500">What gets built</p>
-        <h2 class="text-4xl font-bold text-slate-800">An autonomous business.<br/>From scratch. In two weeks.</h2>
-        <p class="text-slate-500 text-lg max-w-2xl">Every architectural decision is made with one constraint: time-to-revenue. This is what gets delivered.</p>
-      </div>
-      <div class="grid md:grid-cols-3 gap-6">
-        <div class="power-card">
-          <div class="power-icon">💰</div>
-          <h4 class="text-xl font-semibold text-slate-800">Revenue Architecture</h4>
-          <p class="text-slate-500 mt-2">Your business won't just have a product. It will have a customer acquisition flow, a delivery system, and a revenue loop — designed from day one to run unattended.</p>
-        </div>
-        <div class="power-card">
-          <div class="power-icon">⚙️</div>
-          <h4 class="text-xl font-semibold text-slate-800">AI-Native Stack</h4>
-          <p class="text-slate-500 mt-2">Every critical function — marketing, fulfillment, support — backed by an AI agent that executes without you. Built on infrastructure you own and control.</p>
-        </div>
-        <div class="power-card">
-          <div class="power-icon">🌊</div>
-          <h4 class="text-xl font-semibold text-slate-800">Passive Income Infrastructure</h4>
-          <p class="text-slate-500 mt-2">Not a side hustle. A system. One that earns, delivers, and operates while you're building something else. Revenue that doesn't require your presence.</p>
-        </div>
-        <div class="power-card">
-          <div class="power-icon">🔭</div>
-          <h4 class="text-xl font-semibold text-slate-800">Operational Autonomy</h4>
-          <p class="text-slate-500 mt-2">By the end of week two, your business runs. You monitor. You don't operate. That's the difference between owning a business and being owned by one.</p>
-        </div>
-        <div class="power-card">
-          <div class="power-icon">📋</div>
-          <h4 class="text-xl font-semibold text-slate-800">Reproducible Architecture</h4>
-          <p class="text-slate-500 mt-2">Everything is documented, version-controlled, and reproducible. You'll know exactly how to do this again — and do it faster the next time.</p>
-        </div>
-        <div class="power-card">
-          <div class="power-icon">🚀</div>
-          <h4 class="text-xl font-semibold text-slate-800">Speed to Revenue</h4>
-          <p class="text-slate-500 mt-2">We don't build for elegance. We build for revenue. Every decision your Architect makes is evaluated against one question: does this get you to income faster?</p>
-        </div>
-      </div>
-    </section>
+async function load() {
+  const res = await fetch(API, { headers: { 'x-metrics-key': KEY } });
+  if (!res.ok) { document.getElementById('loader').textContent = 'Failed to load data.'; return; }
+  const data = await res.json();
+  render(data);
+  document.getElementById('loader').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+}
 
-    <!-- ─── HOW IT WORKS ───────────────────────────────────── -->
-    <section id="how-it-works" class="space-y-10">
-      <div class="space-y-3">
-        <p class="uppercase tracking-[0.3em] text-sm text-pink-500">The engagement</p>
-        <h2 class="text-4xl font-bold text-slate-800">Structured. Intensive.<br/>Delivered in two weeks.</h2>
-        <p class="text-slate-500 text-lg max-w-2xl">Your Architect runs the engagement. You bring the ambition. Here's how it moves.</p>
-      </div>
-      <div class="grid md:grid-cols-2 gap-10 items-start">
-        <ol class="space-y-6">
-          <li class="timeline-item">
-            <div class="timeline-num">1</div>
-            <div>
-              <h4 class="font-semibold text-lg text-slate-800">Discovery & Architecture</h4>
-              <p class="text-slate-500 mt-1">Your Architect opens with a rapid discovery session. Business model, revenue mechanics, target customer, and tech stack — all decided before a single line of code is written. We move with conviction, not ambiguity.</p>
-            </div>
-          </li>
-          <li class="timeline-item">
-            <div class="timeline-num">2</div>
-            <div>
-              <h4 class="font-semibold text-lg text-slate-800">Build Sprint</h4>
-              <p class="text-slate-500 mt-1">Your Architect builds alongside you — live. Infrastructure, AI agents, automations, integrations, payment flows. The real thing. Every session ends with something deployed, not just discussed.</p>
-            </div>
-          </li>
-          <li class="timeline-item">
-            <div class="timeline-num">3</div>
-            <div>
-              <h4 class="font-semibold text-lg text-slate-800">Revenue Activation</h4>
-              <p class="text-slate-500 mt-1">Your business goes live. Payment infrastructure activates. Acquisition flow runs. This is the moment the system becomes real — not theoretical. Your Architect doesn't move on until it works.</p>
-            </div>
-          </li>
-          <li class="timeline-item">
-            <div class="timeline-num">4</div>
-            <div>
-              <h4 class="font-semibold text-lg text-slate-800">Handoff & Capability Transfer</h4>
-              <p class="text-slate-500 mt-1">You leave with a live business, a complete runbook, and the working knowledge to build the next one. Your Architect doesn't take the keys with them. You own everything — and you know how all of it works.</p>
-            </div>
-          </li>
-        </ol>
-        <div class="bg-white border border-rose-100 rounded-3xl p-8 space-y-6 shadow-sm">
-          <h3 class="text-xl font-semibold text-slate-800">What the engagement delivers</h3>
-          <ul class="space-y-3 text-slate-600">
-            <li class="flex gap-3"><span class="text-pink-400">▸</span> <strong>Deployed, revenue-generating online business</strong> — live on exit</li>
-            <li class="flex gap-3"><span class="text-pink-400">▸</span> End-to-end AI agent stack — built, tested, and operational</li>
-            <li class="flex gap-3"><span class="text-pink-400">▸</span> Payment and passive income infrastructure — connected and active</li>
-            <li class="flex gap-3"><span class="text-pink-400">▸</span> Complete runbook and operational documentation</li>
-            <li class="flex gap-3"><span class="text-pink-400">▸</span> Reproducible architecture — fully yours to extend and scale</li>
-            <li class="flex gap-3"><span class="text-pink-400">▸</span> Capability transfer — you understand every piece of what was built</li>
-          </ul>
-          <div class="border-t border-rose-100 pt-4">
-            <p class="text-sm text-slate-400">Week 1 — Architecture, infrastructure, and build sprint</p>
-            <p class="text-sm text-slate-400">Week 2 — Revenue activation, hardening, and handoff</p>
-          </div>
-        </div>
-      </div>
-    </section>
+function render(d) {
+  const s = d.summary;
 
-    <!-- ─── PRICING ─────────────────────────────────────────── -->
-    <section id="pricing" class="space-y-10">
-      <div class="text-center space-y-4 max-w-3xl mx-auto">
-        <p class="uppercase tracking-[0.3em] text-sm text-pink-500">Two ways to engage</p>
-        <h2 class="text-4xl md:text-5xl font-bold text-slate-800">Choose your engagement.</h2>
-        <p class="text-slate-500 text-lg">Start with the intensive to get your first business live. Stay on retainer when you're ready to build the next one.</p>
-      </div>
+  // Summary cards
+  const cards = [
+    { label: 'Total Sessions',    value: s.totalSessions, sub: `${s.newVisitors} new visitors` },
+    { label: 'Total Events',      value: s.totalEvents,   sub: 'page views + interactions' },
+    { label: 'Avg Time on Page',  value: s.avgDuration + 's', sub: 'before leaving' },
+    { label: 'CTA Click Rate',    value: s.ctaRate + '%',  sub: `${s.ctaClicks} total clicks` },
+  ];
+  document.getElementById('summary-cards').innerHTML = cards.map(c => `
+    <div class="card">
+      <div class="stat-num text-white">${c.value}</div>
+      <div class="text-xs text-slate-400 mt-1">${c.label}</div>
+      <div class="text-xs text-slate-500 mt-1">${c.sub}</div>
+    </div>
+  `).join('');
 
-      <div class="grid md:grid-cols-2 gap-6 items-stretch">
+  // Device chart
+  new Chart(document.getElementById('deviceChart'), {
+    type: 'doughnut',
+    data: {
+      labels: d.devices.map(x => x.name),
+      datasets: [{ data: d.devices.map(x => x.count), backgroundColor: ['#ec4899','#a855f7','#0ea5e9','#22d3ee'] }]
+    },
+    options: { plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } } } }
+  });
 
-        <!-- Option 1: Intensive -->
-        <div class="bg-white border border-rose-100 rounded-3xl p-8 shadow-sm flex flex-col gap-6 relative">
-          <div class="absolute -top-4 left-8">
-            <span class="inline-block text-xs uppercase tracking-widest text-pink-500 bg-pink-50 px-3 py-1 rounded-full font-semibold">Entry engagement</span>
-          </div>
-          <div class="pt-2">
-            <h3 class="text-2xl font-bold text-slate-800">AI Operator Engagement</h3>
-            <p class="text-slate-500 mt-2 leading-relaxed">Two weeks. One Architect. A fully operational AI-powered business — live and generating revenue by the end.</p>
-          </div>
-          <div class="flex items-end gap-2">
-            <span class="text-5xl font-extrabold text-slate-800">$200</span>
-            <span class="text-slate-400 mb-2 text-lg">one time</span>
-          </div>
-          <ul class="space-y-3 text-slate-600 flex-1">
-            <li class="flex gap-3"><span class="text-pink-400 mt-0.5">▸</span> Architect-led delivery across 2 intensive weeks</li>
-            <li class="flex gap-3"><span class="text-pink-400 mt-0.5">▸</span> Business architecture and revenue model designed with you</li>
-            <li class="flex gap-3"><span class="text-pink-400 mt-0.5">▸</span> Full AI-native business built and deployed — live on exit</li>
-            <li class="flex gap-3"><span class="text-pink-400 mt-0.5">▸</span> Payment infrastructure and passive income loop activated</li>
-            <li class="flex gap-3"><span class="text-pink-400 mt-0.5">▸</span> Complete runbook, docs, and capability transfer</li>
-          </ul>
-          <button class="cta-primary" data-checkout="ai-operator-kit">
-            Engage
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </button>
-        </div>
-
-        <!-- Option 2: Fractional Principal Architect -->
-        <div class="bg-white rounded-3xl p-8 shadow-md flex flex-col gap-6 relative" style="border: 2px solid #c4b5fd;">
-          <div class="absolute -top-4 left-8">
-            <span class="inline-block text-xs uppercase tracking-widest text-violet-600 bg-violet-100 px-3 py-1 rounded-full font-semibold">Ongoing retainer</span>
-          </div>
-          <div class="pt-2">
-            <h3 class="text-2xl font-bold text-slate-800">Fractional Principal Architect</h3>
-            <p class="text-slate-500 mt-2 leading-relaxed">One dedicated hour per week. Your Architect embedded in your operation — designing, building, and optimizing as you scale.</p>
-          </div>
-          <div class="flex items-end gap-2">
-            <span class="text-5xl font-extrabold text-slate-800">$397</span>
-            <span class="text-slate-400 mb-2 text-lg">/month</span>
-          </div>
-          <ul class="space-y-3 text-slate-600 flex-1">
-            <li class="flex gap-3"><span class="text-violet-400 mt-0.5">▸</span> 1 hour/week — in person or remote, your choice</li>
-            <li class="flex gap-3"><span class="text-violet-400 mt-0.5">▸</span> Ongoing AI architecture and business systems strategy</li>
-            <li class="flex gap-3"><span class="text-violet-400 mt-0.5">▸</span> Hands-on builds, system reviews, and live optimizations</li>
-            <li class="flex gap-3"><span class="text-violet-400 mt-0.5">▸</span> Priority access as your operation grows</li>
-            <li class="flex gap-3"><span class="text-violet-400 mt-0.5">▸</span> Cancel anytime — no lock-in</li>
-          </ul>
-          <button class="cta-primary" data-checkout="fractional-architect" style="background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%); box-shadow: 0 4px 24px rgba(124,58,237,0.18);">
-            Get Monthly Access
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </button>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- ─── QUOTE ──────────────────────────────────────────── -->
-    <section class="vision-section">
-      <div class="space-y-6 max-w-3xl">
-        <p class="text-pink-400 text-5xl">"</p>
-        <p class="text-2xl md:text-3xl font-semibold leading-snug text-slate-700">The most valuable thing isn't the AI. It's what you have when it's over — a business that operates without you, built in two weeks, with the knowledge to do it again. That's not a promise. That's the deliverable.</p>
-        <p class="text-slate-400">The business is the outcome. The capability is what you keep.</p>
-      </div>
-    </section>
-
-    <!-- ─── CTA SECTION ───────────────────────────────────── -->
-    <section class="cta-section" style="position: relative; overflow: hidden;">
-      <img src="/images/logo.png" alt="" aria-hidden="true" class="absolute pointer-events-none select-none"
-        style="
-          left: 50%;
-          top: 50%;
-          transform: translate(-50%, -50%) rotate(-8deg);
-          width: min(600px, 90vw);
-          opacity: 0.1;
-          filter: blur(1px);
-          mix-blend-mode: multiply;
-        "
-      />
-      <p class="text-sm uppercase tracking-[0.3em] text-pink-400">Let's build</p>
-      <h2 class="text-4xl md:text-5xl font-bold text-slate-800">Your Architect is ready.<br/>Are you?</h2>
-      <p class="text-xl text-slate-600 max-w-xl">Two weeks from now, your business is live. Let's get started.</p>
-      <div class="flex flex-col sm:flex-row gap-4 flex-wrap">
-        <button class="cta-primary" data-checkout="ai-operator-kit">
-          Engage
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </button>
-        <button class="cta-primary" data-checkout="fractional-architect" style="background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%); box-shadow: 0 4px 24px rgba(124,58,237,0.18);">
-          Get Monthly Architect Access
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </button>
-        <a href="#faq" class="border border-pink-200 text-pink-500 px-6 py-4 rounded-2xl text-lg flex items-center justify-center hover:border-pink-400 hover:text-pink-600 transition-colors">I have a question first</a>
-      </div>
-    </section>
-
-    <!-- ─── FAQ ───────────────────────────────────────────── -->
-    <section id="faq" class="space-y-6">
-      <h2 class="text-3xl font-bold text-slate-800">Honest answers</h2>
-      <div class="space-y-4 text-slate-600">
-        <details class="bg-white border border-rose-100 rounded-2xl p-5 shadow-sm" open>
-          <summary class="font-semibold cursor-pointer text-slate-800">What does the engagement actually look like?</summary>
-          <p class="mt-3 text-slate-500">High-touch and hands-on. Your Architect works directly with you — not through pre-recorded content, not through a cohort, not asynchronously. Every session is live, focused, and moving toward a specific deliverable. It moves fast by design. You will be building real things in the first session.</p>
-        </details>
-        <details class="bg-white border border-rose-100 rounded-2xl p-5 shadow-sm">
-          <summary class="font-semibold cursor-pointer text-slate-800">What kind of business will we build?</summary>
-          <p class="mt-3 text-slate-500">Something that matches your expertise, assets, and market. AI-powered digital products, automated service businesses, content-to-revenue systems — whatever has the highest probability of generating real income in your hands. Your Architect assesses this in the first session and builds toward it from day one.</p>
-        </details>
-        <details class="bg-white border border-rose-100 rounded-2xl p-5 shadow-sm">
-          <summary class="font-semibold cursor-pointer text-slate-800">I've never built a business before. Is this right for me?</summary>
-          <p class="mt-3 text-slate-500">Yes — if you're serious about it. The engagement is intensive and moves fast, but your Architect is there to guide every step. You won't need prior technical knowledge, business experience, or a fully formed idea going in. What you will need is genuine commitment to two weeks of focused work. The people who get the most out of this aren't the ones with the most background — they're the ones who show up ready to build.</p>
-        </details>
-        <details class="bg-white border border-rose-100 rounded-2xl p-5 shadow-sm">
-          <summary class="font-semibold cursor-pointer text-slate-800">I've already built companies. Why would I need this?</summary>
-          <p class="mt-3 text-slate-500">Because the toolset just changed. Founders who built before 2024 are sitting on business instincts and market knowledge that AI can now execute at a fraction of the cost and time. You don't need to learn the tools — you need an Architect who knows how to apply them to your specific advantage. The entrepreneurs getting ahead right now are the ones who figured that out early.</p>
-        </details>
-        <details class="bg-white border border-rose-100 rounded-2xl p-5 shadow-sm">
-          <summary class="font-semibold cursor-pointer text-slate-800">What does "operational" actually mean?</summary>
-          <p class="mt-3 text-slate-500">Live, reachable, connected to payment infrastructure, and capable of generating income without your daily involvement. Not a prototype. Not a proof of concept. A working business — with a product, a customer acquisition path, and revenue flowing through it before the engagement ends.</p>
-        </details>
-        <details class="bg-white border border-rose-100 rounded-2xl p-5 shadow-sm">
-          <summary class="font-semibold cursor-pointer text-slate-800">Why $200 for a two-week architect-led engagement?</summary>
-          <p class="mt-3 text-slate-500">We're building early case studies with serious operators. You get an Architect's full attention and a live business. We get proof that this model works at scale. The price is intentionally low. The engagement is not.</p>
-        </details>
-      </div>
-    </section>
-
-  </main>
-
-  <footer class="border-t border-rose-100 py-10 text-center space-y-2">
-    <p class="text-slate-400 text-sm">© 2026 AI Operator — Made with care by <a href="https://securebydezign.com" class="text-pink-400 hover:underline">Secure by Dezign</a></p>
-    <p class="text-slate-300 text-xs">Professional services. AI-native business delivery. Yours to operate.</p>
-    <p class="text-slate-400 text-sm"><a href="mailto:support@ai-operator.biz" class="text-pink-400 hover:underline">support@ai-operator.biz</a></p>
-  </footer>
-
-  <script src="/js/stripe-checkout.js" defer></script>
-  <script>
-    // ─── iMessage animation ──────────────────────────────────
-    const conversations = [
-      { user: "What's the highest-leverage business I can build this month?",  reply: "3 validated paths based on your assets. Ranking them now 🎯" },
-      { user: "Revenue update — what happened overnight?",                      reply: "$340 processed. 4 new customers. 0 interventions required 💰" },
-      { user: "I want recurring revenue. What's the fastest path?",            reply: "Subscription tier. I'll architect the billing loop today 🔁" },
-      { user: "Is the acquisition flow converting?",                            reply: "68% funnel conversion. Top drop-off at step 2 — fixing now 📊" },
-      { user: "Can we launch a second product without adding overhead?",        reply: "Yes. Same infrastructure, new SKU. Deploying parallel funnel ⚡" },
-      { user: "What's my business doing right now?",                           reply: "All systems operational. 12 active subscribers. 0 issues 🟢" },
-      { user: "How long until this generates meaningful passive income?",       reply: "At current trajectory — 6 weeks to break-even. Want the model? 📈" },
-      { user: "What should I build next?",                                      reply: "You have 3 unfired levers. I'll brief you in 60 seconds 🚀" },
-    ];
-
-    let convIndex = 0;
-    const chatBody = document.getElementById('chat-body');
-    const chatInput = document.getElementById('chat-input');
-
-    const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-    async function typeInto(el, text, speed = 38) {
-      for (let i = 0; i <= text.length; i++) {
-        el.textContent = text.slice(0, i);
-        await sleep(speed);
-      }
+  // Click chart
+  const clickLabels = Object.keys(d.clicks);
+  const clickVals   = Object.values(d.clicks);
+  new Chart(document.getElementById('clickChart'), {
+    type: 'bar',
+    data: {
+      labels: clickLabels,
+      datasets: [{ data: clickVals, backgroundColor: '#a855f7', borderRadius: 4 }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: { x: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }, y: { ticks: { color: '#64748b' }, grid: { color: '#334155' } } }
     }
+  });
 
-    function addBubble(text, type) {
-      const bubble = document.createElement('div');
-      bubble.className = `chat-bubble ${type}`;
-      bubble.textContent = text;
-      chatBody.appendChild(bubble);
-      chatBody.scrollTop = chatBody.scrollHeight;
-      return bubble;
-    }
+  // Countries
+  const maxC = d.countries[0]?.count || 1;
+  document.getElementById('countries-list').innerHTML = d.countries.map(c => `
+    <div>
+      <div class="flex justify-between"><span class="text-slate-300">${c.name || 'Unknown'}</span><span class="text-slate-500">${c.count}</span></div>
+      ${bar(Math.round((c.count / maxC) * 100), '#0ea5e9')}
+    </div>`).join('') || '<p class="text-slate-500 text-xs">No data yet</p>';
 
-    async function runChat() {
-      const conv = conversations[convIndex % conversations.length];
-      convIndex++;
+  // Referrers
+  const maxR = d.referrers[0]?.count || 1;
+  document.getElementById('referrers-list').innerHTML = d.referrers.map(r => `
+    <div>
+      <div class="flex justify-between"><span class="text-slate-300">${r.name || 'Direct'}</span><span class="text-slate-500">${r.count}</span></div>
+      ${bar(Math.round((r.count / maxR) * 100))}
+    </div>`).join('') || '<p class="text-slate-500 text-xs">No data yet</p>';
 
-      chatBody.innerHTML = '';
-      chatInput.textContent = '';
+  // UTM
+  const maxU = d.utmSources[0]?.count || 1;
+  document.getElementById('utm-list').innerHTML = d.utmSources.map(u => `
+    <div>
+      <div class="flex justify-between"><span class="text-slate-300">${u.name}</span><span class="text-slate-500">${u.count}</span></div>
+      ${bar(Math.round((u.count / maxU) * 100), '#4ade80')}
+    </div>`).join('') || '<p class="text-slate-500 text-xs">No UTM data yet</p>';
 
-      await sleep(700);
-      await typeInto(chatInput, conv.user, 36);
-      await sleep(300);
+  // Recent sessions
+  document.getElementById('session-rows').innerHTML = d.recent.map(s => `
+    <tr class="text-slate-400 hover:bg-slate-800/40">
+      <td class="py-2 pr-4 text-xs text-slate-500">${fmt(s.ts)}</td>
+      <td class="py-2 pr-4 font-mono text-xs">${s.sid}…</td>
+      <td class="py-2 pr-4"><span class="dot ${s.isNew ? 'dot-new' : 'dot-ret'}"></span>${s.isNew ? 'New' : 'Return'}</td>
+      <td class="py-2 pr-4">${s.device || '—'}</td>
+      <td class="py-2 pr-4">${s.country || '—'}</td>
+      <td class="py-2 pr-4 max-w-xs truncate text-xs">${s.referrer || 'Direct'}</td>
+      <td class="py-2 pr-4 text-xs">${s.utmSrc || '—'}</td>
+      <td class="py-2 pr-4">${s.duration ? s.duration + 's' : '—'}</td>
+      <td class="py-2">${s.scroll ? s.scroll + '%' : '—'}</td>
+    </tr>`).join('') || '<tr><td colspan="9" class="py-4 text-slate-500 text-center text-xs">No sessions yet</td></tr>';
+}
 
-      addBubble(conv.user, 'sent');
-      chatInput.textContent = '';
-
-      await sleep(600);
-
-      const typing = document.createElement('div');
-      typing.className = 'chat-typing';
-      typing.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
-      chatBody.appendChild(typing);
-      chatBody.scrollTop = chatBody.scrollHeight;
-
-      await sleep(1600);
-
-      chatBody.removeChild(typing);
-      addBubble(conv.reply, 'received');
-
-      await sleep(2800);
-      runChat();
-    }
-
-    runChat();
-
-    // ─── Counter animation ───────────────────────────────────
-    function animateCounter(el) {
-      const target = parseInt(el.dataset.target, 10);
-      const duration = 1800;
-      const start = performance.now();
-      function step(now) {
-        const elapsed = now - start;
-        const progress = Math.min(elapsed / duration, 1);
-        const ease = 1 - Math.pow(1 - progress, 3);
-        el.textContent = Math.floor(ease * target);
-        if (progress < 1) requestAnimationFrame(step);
-        else el.textContent = target;
-      }
-      requestAnimationFrame(step);
-    }
-
-    const counterObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.querySelectorAll('[data-target]').forEach(animateCounter);
-          counterObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.3 });
-
-    const powerStrip = document.querySelector('.power-strip');
-    if (powerStrip) counterObserver.observe(powerStrip);
-  </script>
+load();
+setInterval(load, 60000); // auto-refresh every minute
+</script>
 </body>
 </html>
