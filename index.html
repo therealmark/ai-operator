@@ -561,8 +561,12 @@
 
   function send(extra) {
     const payload = { ...base, ts: new Date().toISOString(), ...extra };
-    navigator.sendBeacon ? navigator.sendBeacon(API, JSON.stringify(payload))
-      : fetch(API, { method: 'POST', body: JSON.stringify(payload), keepalive: true }).catch(() => {});
+    fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      keepalive: true,
+    }).catch(() => {});
   }
 
   // Pageview
