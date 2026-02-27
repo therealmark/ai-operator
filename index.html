@@ -520,5 +520,77 @@
     const powerStrip = document.querySelector('.power-strip');
     if (powerStrip) counterObserver.observe(powerStrip);
   </script>
+
+<!-- ─── ANALYTICS TRACKER ──────────────────────────────────── -->
+<script>
+(function () {
+  const API = 'https://z01mzuzo05.execute-api.us-east-1.amazonaws.com/prod/api/track';
+  const VID_KEY = 'ao_vid';
+  const SID_KEY = 'ao_sid';
+
+  function uid() { return Math.random().toString(36).slice(2, 10) + Date.now().toString(36); }
+  function getDevice() {
+    const w = window.innerWidth;
+    return w < 768 ? 'mobile' : w < 1024 ? 'tablet' : 'desktop';
+  }
+  function getUtm(k) { return new URLSearchParams(location.search).get(k) || ''; }
+
+  // Visitor ID (persists across sessions)
+  let vid = localStorage.getItem(VID_KEY);
+  if (!vid) { vid = uid(); localStorage.setItem(VID_KEY, vid); }
+
+  // Session ID (resets per tab/session)
+  let sid = sessionStorage.getItem(SID_KEY);
+  const isNew = !sid;
+  if (!sid) { sid = uid(); sessionStorage.setItem(SID_KEY, sid); }
+
+  const base = {
+    sid, vid, isNew,
+    page:     location.pathname,
+    referrer: document.referrer,
+    utmSrc:   getUtm('utm_source'),
+    utmMed:   getUtm('utm_medium'),
+    utmCamp:  getUtm('utm_campaign'),
+    utmTerm:  getUtm('utm_term'),
+    utmCont:  getUtm('utm_content'),
+    ua:       navigator.userAgent,
+    lang:     navigator.language,
+    screen:   `${screen.width}x${screen.height}`,
+    device:   getDevice(),
+  };
+
+  function send(extra) {
+    const payload = { ...base, ts: new Date().toISOString(), ...extra };
+    navigator.sendBeacon ? navigator.sendBeacon(API, JSON.stringify(payload))
+      : fetch(API, { method: 'POST', body: JSON.stringify(payload), keepalive: true }).catch(() => {});
+  }
+
+  // Pageview
+  send({ type: 'pageview' });
+
+  // CTA clicks
+  document.addEventListener('click', function (e) {
+    const el = e.target.closest('[data-checkout], .cta-primary, a[href*="calendar"], a[href*="mailto"]');
+    if (!el) return;
+    const label = el.dataset.checkout || el.textContent.trim().slice(0, 40) || el.href;
+    send({ type: 'click', label });
+  });
+
+  // Duration + scroll depth on unload
+  const t0 = Date.now();
+  let maxScroll = 0;
+  window.addEventListener('scroll', function () {
+    const pct = Math.round(((window.scrollY + window.innerHeight) / document.documentElement.scrollHeight) * 100);
+    if (pct > maxScroll) maxScroll = pct;
+  }, { passive: true });
+
+  window.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') {
+      send({ type: 'exit', duration: Math.round((Date.now() - t0) / 1000), scrollDepth: maxScroll });
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
