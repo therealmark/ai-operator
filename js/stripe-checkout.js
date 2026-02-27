@@ -9,12 +9,12 @@
 (() => {
   const TEST = {
     'ai-operator-kit':      'https://book.stripe.com/test_7sY3cubt77qu5eGf5AeME0c',
-    'fractional-architect': 'https://buy.stripe.com/test_3cIfZgap326agXoe1weME0b',
+    'fractional-architect': 'https://buy.stripe.com/test_8x2dR82WB4ei4aCf5AeME0d',
   };
 
   const LIVE = {
     'ai-operator-kit':      'https://book.stripe.com/cNi3cucnggacgDu56pb7y0g',
-    'fractional-architect': 'https://buy.stripe.com/aFafZg5YSgac4UMbuNb7y0f',
+    'fractional-architect': 'https://buy.stripe.com/00waEW2MG7DG3QI2Yhb7y0h',
   };
 
   const useTest = window.location.hostname === 'localhost' ||
