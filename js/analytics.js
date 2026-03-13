@@ -3,7 +3,7 @@
  * Captures visitor data and sends to /api/track
  */
 (function () {
-  const API = 'https://z01mzuzo05.execute-api.us-east-1.amazonaws.com/prod/api/track';
+  const API = 'https://2mgtb86ive.execute-api.us-west-2.amazonaws.com/prod/api/track';
 
   // ── Session / visitor identity ──────────────────────────────────────────────
   let vid = localStorage.getItem('_ao_vid');
